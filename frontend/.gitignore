@@ -38,6 +38,7 @@ yarn-error.log
 testem.log
 /typings
 __screenshots__/
+.angular/dist/
 
 # System files
 .DS_Store
