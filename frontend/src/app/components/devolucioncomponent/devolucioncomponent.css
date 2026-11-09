@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.estado-grande {
+  padding: 0.35rem 1rem;
+  font-size: 1rem;
+}
+
+.titulo-libro {
+  margin-bottom: 1.5rem;
+  font-size: 1.9rem;
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.recibe {
+  font-size: 1.4rem;
+}
+
+.confirmar {
+  min-height: 54px;
+  padding: 0 1.8rem;
+  font-size: 1.05rem;
+}

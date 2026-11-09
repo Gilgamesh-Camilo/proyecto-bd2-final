@@ -1,0 +1,397 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <div class="encabezado-fila">
+      <h1>Préstamos</h1>
+      @if (panel) {
+        <ul class="cifras">
+          <li>
+            <i class="fa-solid fa-clock" aria-hidden="true"></i>{{ panel.prestamosAlDia }} al día
+          </li>
+          <li class="alerta">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i
+            >{{ panel.prestamosVencidos }} vencidos
+          </li>
+        </ul>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="franja tono-negro" aria-label="Buscar un préstamo">
+  <div class="container">
+    <form class="buscador" (ngSubmit)="buscar()" novalidate>
+      <div class="campo-icono campo-grande">
+        <label class="visually-hidden" for="busqueda">Código de barras o documento del socio</label>
+        <i class="fa-solid fa-barcode icono-campo" aria-hidden="true"></i>
+        <input
+          id="busqueda"
+          name="busqueda"
+          type="text"
+          class="form-control"
+          placeholder="Código o documento"
+          [(ngModel)]="busqueda"
+          (ngModelChange)="errorBusqueda = ''"
+          [class.is-invalid]="errorBusqueda !== ''"
+        />
+        <div class="invalid-feedback">{{ errorBusqueda }}</div>
+      </div>
+      <button
+        class="boton-principal boton-icono grande"
+        type="submit"
+        title="Buscar"
+        aria-label="Buscar"
+      >
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      </button>
+      @if (busquedaAplicada !== '') {
+        <button
+          class="boton-secundario boton-icono grande"
+          type="button"
+          (click)="limpiarBusqueda()"
+          title="Quitar la búsqueda"
+          aria-label="Quitar la búsqueda"
+        >
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      }
+    </form>
+
+    @if (mensaje !== '') {
+      <div class="alert alert-success alert-dismissible mt-4 mb-0" role="status">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensaje }}
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="mensaje = ''"></button>
+      </div>
+    }
+    @if (errorAccion !== '') {
+      <div class="alert alert-danger alert-dismissible mt-4 mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorAccion }}
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="errorAccion = ''"
+        ></button>
+      </div>
+    }
+
+    @if (busquedaAplicada !== '' && !cargando && error === '') {
+      @for (p of abiertos; track p.idPrestamo) {
+        <div class="resultado animate__animated animate__fadeIn">
+          <div class="resultado-datos">
+            <div class="resultado-titulo">{{ p.titulo }}</div>
+            <ul class="meta">
+              <li><i class="fa-solid fa-barcode" aria-hidden="true"></i>{{ p.codigoBarras }}</li>
+              <li><i class="fa-solid fa-user" aria-hidden="true"></i>{{ p.socio }}</li>
+              <li>
+                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>{{ p.sedePrestamo }}
+              </li>
+              <li>
+                <i class="fa-solid fa-calendar" aria-hidden="true"></i
+                >{{ p.fechaLimite | date: 'dd/MM/yyyy' }}
+              </li>
+            </ul>
+            @if (p.diasRetraso > 0) {
+              <ul class="meta alerta">
+                <li>
+                  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i
+                  >{{ p.diasRetraso }} días de retraso
+                </li>
+              </ul>
+            }
+          </div>
+          <div class="d-flex gap-2">
+            @if (p.estado === 'ACTIVO') {
+              <button
+                class="boton-secundario boton-icono"
+                type="button"
+                (click)="renovar(p)"
+                [disabled]="renovando !== null"
+                [title]="'Renovar ' + p.codigoBarras"
+                [attr.aria-label]="'Renovar ' + p.codigoBarras"
+              >
+                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+              </button>
+            }
+            <a class="boton-principal" [routerLink]="['/prestamos', p.idPrestamo, 'devolucion']">
+              <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>Devolver
+            </a>
+            <a
+              class="boton-secundario boton-icono"
+              [routerLink]="['/socios', p.idSocio]"
+              [title]="'Ver a ' + p.socio"
+              [attr.aria-label]="'Ver a ' + p.socio"
+            >
+              <i class="fa-solid fa-eye" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      } @empty {
+        <p class="resultado-vacio">
+          <i class="fa-solid fa-circle-info me-2" aria-hidden="true"></i>"{{ busquedaAplicada }}" no
+          tiene préstamos abiertos.
+        </p>
+      }
+    }
+  </div>
+</section>
+
+<section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-recientes">
+  <div class="container">
+    <div class="franja-cabeza">
+      <h2 class="franja-titulo" id="titulo-recientes">
+        {{ busquedaAplicada === '' ? 'Recientes' : 'Historial' }}
+      </h2>
+      <div class="d-flex flex-wrap align-items-start gap-2">
+        <div class="pestanas" role="group" aria-label="Estado">
+          <button
+            class="pestana"
+            type="button"
+            [class.activa]="estado === ''"
+            [attr.aria-pressed]="estado === ''"
+            (click)="estado = ''; cargar()"
+          >
+            Todos
+          </button>
+          @for (e of estados; track e) {
+            <button
+              class="pestana"
+              type="button"
+              [class.activa]="estado === e"
+              [attr.aria-pressed]="estado === e"
+              (click)="estado = e; cargar()"
+            >
+              {{ e | estado }}
+            </button>
+          }
+        </div>
+        <div class="campo-icono filtro-sede">
+          <label class="visually-hidden" for="sede">Sede del préstamo</label>
+          <i class="fa-solid fa-location-dot icono-campo" aria-hidden="true"></i>
+          <select
+            id="sede"
+            name="sede"
+            class="form-select"
+            [(ngModel)]="idSede"
+            (ngModelChange)="cargar()"
+            [class.is-invalid]="errorSede !== ''"
+          >
+            <option [ngValue]="null">Todas las sedes</option>
+            @for (s of sedes; track s.idSede) {
+              <option [ngValue]="s.idSede">{{ s.nombre }}</option>
+            }
+          </select>
+          <div class="invalid-feedback">{{ errorSede }}</div>
+        </div>
+      </div>
+    </div>
+    @if (errorEstado !== '') {
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorEstado }}
+      </div>
+    }
+
+    @if (cargando) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando
+        préstamos...
+      </p>
+    } @else if (error !== '') {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ error }}
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Libro</th>
+              <th scope="col">Socio</th>
+              <th scope="col">Sede</th>
+              <th scope="col">Límite</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of prestamos; track p.idPrestamo) {
+              <tr>
+                <td>
+                  <div class="principal">{{ p.titulo }}</div>
+                  <div class="small texto-suave">{{ p.codigoBarras }}</div>
+                </td>
+                <td>
+                  <a [routerLink]="['/socios', p.idSocio]">{{ p.socio }}</a>
+                  <div class="small texto-suave">{{ p.numeroDocumento }}</div>
+                </td>
+                <td>
+                  {{ p.sedePrestamo }}
+                  @if (p.sedeDevolucion && p.sedeDevolucion !== p.sedePrestamo) {
+                    <div class="small texto-suave">
+                      <i class="fa-solid fa-arrow-rotate-left me-1" aria-hidden="true"></i
+                      >{{ p.sedeDevolucion }}
+                    </div>
+                  }
+                </td>
+                <td>
+                  {{ p.fechaLimite | date: 'dd/MM/yyyy' }}
+                  @if (p.numRenovaciones > 0) {
+                    <div class="small texto-suave">
+                      <i class="fa-solid fa-rotate-right me-1" aria-hidden="true"></i
+                      >{{ p.numRenovaciones }}
+                    </div>
+                  }
+                </td>
+                <td>
+                  @if (estaAbierto(p) && p.diasRetraso > 0) {
+                    <span class="estado" data-estado="VENCIDO">{{ p.diasRetraso }} días</span>
+                  } @else {
+                    <span class="estado" [attr.data-estado]="p.estado">{{
+                      p.estado | estado
+                    }}</span>
+                  }
+                </td>
+                <td>
+                  @if (estaAbierto(p)) {
+                    <div class="acciones-fila">
+                      @if (p.estado === 'ACTIVO') {
+                        <button
+                          class="boton-secundario boton-pequeno boton-icono"
+                          type="button"
+                          (click)="renovar(p)"
+                          [disabled]="renovando !== null"
+                          [title]="'Renovar ' + p.codigoBarras"
+                          [attr.aria-label]="'Renovar ' + p.codigoBarras"
+                        >
+                          @if (renovando === p.idPrestamo) {
+                            <span
+                              class="spinner-border spinner-border-sm"
+                              aria-hidden="true"
+                            ></span>
+                          } @else {
+                            <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                          }
+                        </button>
+                      }
+                      <a
+                        class="boton-principal boton-pequeno boton-icono"
+                        [routerLink]="['/prestamos', p.idPrestamo, 'devolucion']"
+                        [title]="'Devolver ' + p.codigoBarras"
+                        [attr.aria-label]="'Devolver ' + p.codigoBarras"
+                      >
+                        <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>
+                      </a>
+                    </div>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="vacio">
+                  <i class="fa-solid fa-inbox" aria-hidden="true"></i>Sin préstamos con esos
+                  filtros.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="franja tono-crema" data-bs-theme="light" aria-labelledby="titulo-prestar">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-3">
+        <h2 class="franja-titulo" id="titulo-prestar">Prestar un libro</h2>
+      </div>
+      <div class="col-lg-9">
+        <form class="prestar" (ngSubmit)="continuarPrestamo()" novalidate>
+          <div class="campo-icono">
+            <label class="visually-hidden" for="documento-prestamo">Documento del socio</label>
+            <i class="fa-solid fa-id-card icono-campo" aria-hidden="true"></i>
+            <input
+              id="documento-prestamo"
+              name="documentoPrestamo"
+              type="text"
+              class="form-control"
+              placeholder="Documento del socio"
+              [(ngModel)]="documentoPrestamo"
+              (ngModelChange)="errorDocumento = ''"
+              [class.is-invalid]="errorDocumento !== ''"
+            />
+            <div class="invalid-feedback">{{ errorDocumento }}</div>
+          </div>
+          <div class="campo-icono">
+            <label class="visually-hidden" for="codigo-prestamo">Código del ejemplar</label>
+            <i class="fa-solid fa-barcode icono-campo" aria-hidden="true"></i>
+            <input
+              id="codigo-prestamo"
+              name="codigoPrestamo"
+              type="text"
+              class="form-control"
+              placeholder="Código del ejemplar"
+              [(ngModel)]="codigoPrestamo"
+              (ngModelChange)="errorCodigo = ''"
+              [class.is-invalid]="errorCodigo !== ''"
+            />
+            <div class="invalid-feedback">{{ errorCodigo }}</div>
+          </div>
+          <button class="boton-principal" type="submit">
+            <i class="fa-solid fa-right-left" aria-hidden="true"></i>Prestar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="franja tono-cafe" aria-labelledby="titulo-hoy">
+  <div class="container">
+    <h2 class="franja-titulo mb-4" id="titulo-hoy">Hoy en la red</h2>
+    @if (panel) {
+      <div class="resumen">
+        <a class="resumen-item" routerLink="/multas">
+          <span class="resumen-icono"><i class="fa-solid fa-coins" aria-hidden="true"></i></span>
+          <span>
+            <span class="resumen-valor">$ {{ panel.valorMultasPendientes | number: '1.0-0' }}</span>
+            <span class="resumen-texto">{{ panel.multasPendientes }} multas</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/traslados">
+          <span class="resumen-icono"
+            ><i class="fa-solid fa-truck-fast" aria-hidden="true"></i
+          ></span>
+          <span>
+            <span class="resumen-valor">{{ panel.trasladosAbiertos }}</span>
+            <span class="resumen-texto">traslados</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/reservas">
+          <span class="resumen-icono"
+            ><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i
+          ></span>
+          <span>
+            <span class="resumen-valor">{{ panel.reservasEnEspera }}</span>
+            <span class="resumen-texto">en espera</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/reservas">
+          <span class="resumen-icono"><i class="fa-solid fa-bookmark" aria-hidden="true"></i></span>
+          <span>
+            <span class="resumen-valor">{{ panel.reservasParaRetirar }}</span>
+            <span class="resumen-texto">por retirar</span>
+          </span>
+        </a>
+      </div>
+    } @else if (errorPanel !== '') {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorPanel }}
+      </div>
+    } @else {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando...
+      </p>
+    }
+  </div>
+</section>
