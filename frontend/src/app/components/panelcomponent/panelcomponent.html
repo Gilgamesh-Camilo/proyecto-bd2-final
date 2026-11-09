@@ -1,0 +1,241 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <div class="encabezado-fila">
+      <div>
+        @if (empleado) {
+          <h1>Hola, {{ empleado.nombres }}</h1>
+          <ul class="meta mt-3">
+            <li>
+              <i class="fa-solid fa-id-badge" aria-hidden="true"></i>{{ empleado.rol | estado }}
+            </li>
+            <li><i class="fa-solid fa-location-dot" aria-hidden="true"></i>{{ empleado.sede }}</li>
+          </ul>
+        }
+      </div>
+      <div class="encabezado-acciones">
+        <a class="boton-principal" routerLink="/prestamos/nuevo">
+          <i class="fa-solid fa-right-left" aria-hidden="true"></i>Prestar
+        </a>
+        <a class="boton-secundario" routerLink="/prestamos">
+          <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>Devolver
+        </a>
+        <a
+          class="boton-secundario boton-icono"
+          routerLink="/catalogo"
+          title="Buscar en el catálogo"
+          aria-label="Buscar en el catálogo"
+        >
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (cargando && !panel) {
+  <section class="franja tono-cafe">
+    <div class="container">
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando el
+        panel...
+      </p>
+    </div>
+  </section>
+} @else if (error !== '') {
+  <section class="franja tono-cafe">
+    <div class="container">
+      <div
+        class="alert alert-danger d-flex justify-content-between align-items-center gap-3 mb-0"
+        role="alert"
+      >
+        <span
+          ><i class="fa-solid fa-triangle-exclamation me-2" aria-hidden="true"></i>{{ error }}</span
+        >
+        <button class="boton-secundario boton-pequeno" type="button" (click)="cargar()">
+          <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>Reintentar
+        </button>
+      </div>
+    </div>
+  </section>
+}
+
+@if (panel) {
+  <section class="franja tono-cafe" aria-labelledby="titulo-hoy">
+    <div class="container">
+      <h2 class="franja-titulo mb-4" id="titulo-hoy">Hoy en la red</h2>
+      <div class="resumen">
+        <a class="resumen-item" routerLink="/prestamos">
+          <span class="resumen-icono"><i class="fa-solid fa-clock" aria-hidden="true"></i></span>
+          <span>
+            <span class="resumen-valor">{{ panel.prestamosAlDia }}</span>
+            <span class="resumen-texto">préstamos al día</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/prestamos">
+          <span class="resumen-icono"
+            ><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i
+          ></span>
+          <span>
+            <span class="resumen-valor">{{ panel.prestamosVencidos }}</span>
+            <span class="resumen-texto">vencidos</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/multas">
+          <span class="resumen-icono"
+            ><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i
+          ></span>
+          <span>
+            <span class="resumen-valor">{{ panel.multasPendientes }}</span>
+            <span class="resumen-texto">multas pendientes</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/multas">
+          <span class="resumen-icono"><i class="fa-solid fa-coins" aria-hidden="true"></i></span>
+          <span>
+            <span class="resumen-valor">$ {{ panel.valorMultasPendientes | number: '1.0-0' }}</span>
+            <span class="resumen-texto">por cobrar</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/reservas">
+          <span class="resumen-icono"
+            ><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i
+          ></span>
+          <span>
+            <span class="resumen-valor">{{ panel.reservasEnEspera }}</span>
+            <span class="resumen-texto">reservas en espera</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/reservas">
+          <span class="resumen-icono"><i class="fa-solid fa-bookmark" aria-hidden="true"></i></span>
+          <span>
+            <span class="resumen-valor">{{ panel.reservasParaRetirar }}</span>
+            <span class="resumen-texto">por retirar</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/traslados">
+          <span class="resumen-icono"
+            ><i class="fa-solid fa-truck-fast" aria-hidden="true"></i
+          ></span>
+          <span>
+            <span class="resumen-valor">{{ panel.trasladosAbiertos }}</span>
+            <span class="resumen-texto">traslados abiertos</span>
+          </span>
+        </a>
+        <a class="resumen-item" routerLink="/catalogo">
+          <span class="resumen-icono"><i class="fa-solid fa-book" aria-hidden="true"></i></span>
+          <span>
+            <span class="resumen-valor">{{ panel.disponiblesEnMiSede }}</span>
+            <span class="resumen-texto">libres en tu sede</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-vencidos">
+    <div class="container">
+      <div class="franja-cabeza">
+        <h2 class="franja-titulo" id="titulo-vencidos">Vencidos de tu sede</h2>
+        <span class="chip">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+          {{ panel.vencidosMiSede.length }}
+        </span>
+      </div>
+      @if (panel.vencidosMiSede.length === 0) {
+        <div class="vacio">
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+          Tu sede no tiene préstamos vencidos.
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Libro</th>
+                <th scope="col">Socio</th>
+                <th scope="col">Límite</th>
+                <th scope="col">Retraso</th>
+                <th scope="col"><span class="visually-hidden">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (v of panel.vencidosMiSede; track v.idPrestamo) {
+                <tr>
+                  <td>
+                    <div class="principal">{{ v.titulo }}</div>
+                    <div class="small texto-suave">{{ v.codigoBarras }}</div>
+                  </td>
+                  <td>{{ v.socio }}</td>
+                  <td>{{ v.fechaLimite | date: 'dd/MM/yyyy' }}</td>
+                  <td>
+                    <span class="estado" data-estado="VENCIDO">{{ v.diasRetraso }} días</span>
+                  </td>
+                  <td>
+                    <div class="acciones-fila">
+                      <a
+                        class="boton-principal boton-pequeno boton-icono"
+                        [routerLink]="['/prestamos', v.idPrestamo, 'devolucion']"
+                        [title]="'Devolver ' + v.codigoBarras"
+                        [attr.aria-label]="'Devolver ' + v.codigoBarras"
+                      >
+                        <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </section>
+
+  @if (puedeMantener) {
+    <section class="franja tono-crema" data-bs-theme="light" aria-labelledby="titulo-mantenimiento">
+      <div class="container">
+        <div class="franja-cabeza mb-0">
+          <div>
+            <h2 class="franja-titulo" id="titulo-mantenimiento">
+              <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>Mantenimiento
+            </h2>
+            <ul class="meta mt-3">
+              <li>
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Vence los
+                préstamos atrasados
+              </li>
+              <li>
+                <i class="fa-solid fa-hourglass-end" aria-hidden="true"></i>Expira las reservas sin
+                retirar
+              </li>
+            </ul>
+          </div>
+          <button
+            class="boton-principal"
+            type="button"
+            (click)="actualizarEstados()"
+            [disabled]="actualizando"
+          >
+            @if (actualizando) {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              Actualizando...
+            } @else {
+              <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>Actualizar estados
+            }
+          </button>
+        </div>
+        @if (mensajeMantenimiento !== '') {
+          <div class="alert alert-success mt-4 mb-0" role="status">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensajeMantenimiento }}
+          </div>
+        }
+        @if (errorMantenimiento !== '') {
+          <div class="alert alert-danger mt-4 mb-0" role="alert">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i
+            >{{ errorMantenimiento }}
+          </div>
+        }
+      </div>
+    </section>
+  }
+}

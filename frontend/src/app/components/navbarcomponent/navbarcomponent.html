@@ -1,0 +1,106 @@
+@if (empleado) {
+  <nav class="navbar navbar-expand-xl barra" aria-label="Principal">
+    <div class="container">
+      <a class="navbar-brand marca" routerLink="/panel">
+        <i class="fa-solid fa-book" aria-hidden="true"></i>BiblioRed
+      </a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#menu-principal"
+        aria-controls="menu-principal"
+        aria-expanded="false"
+        aria-label="Abrir el menú"
+      >
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="collapse navbar-collapse" id="menu-principal">
+        <ul class="navbar-nav menu me-auto">
+          <li class="nav-item">
+            <a class="enlace" routerLink="/panel" routerLinkActive="activo" title="Panel">
+              <i class="fa-solid fa-gauge" aria-hidden="true"></i
+              ><span class="etiqueta">Panel</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="enlace" routerLink="/catalogo" routerLinkActive="activo" title="Catálogo">
+              <i class="fa-solid fa-book" aria-hidden="true"></i
+              ><span class="etiqueta">Catálogo</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="enlace" routerLink="/prestamos" routerLinkActive="activo" title="Préstamos">
+              <i class="fa-solid fa-right-left" aria-hidden="true"></i
+              ><span class="etiqueta">Préstamos</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="enlace" routerLink="/socios" routerLinkActive="activo" title="Socios">
+              <i class="fa-solid fa-users" aria-hidden="true"></i
+              ><span class="etiqueta">Socios</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="enlace" routerLink="/reservas" routerLinkActive="activo" title="Reservas">
+              <i class="fa-solid fa-bookmark" aria-hidden="true"></i
+              ><span class="etiqueta">Reservas</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="enlace" routerLink="/multas" routerLinkActive="activo" title="Multas">
+              <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i
+              ><span class="etiqueta">Multas</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="enlace" routerLink="/traslados" routerLinkActive="activo" title="Traslados">
+              <i class="fa-solid fa-truck-fast" aria-hidden="true"></i
+              ><span class="etiqueta">Traslados</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="enlace"
+              routerLink="/estadisticas"
+              routerLinkActive="activo"
+              title="Estadísticas"
+            >
+              <i class="fa-solid fa-chart-simple" aria-hidden="true"></i
+              ><span class="etiqueta">Estadísticas</span>
+            </a>
+          </li>
+          @if (puede(['ADMINISTRADOR'])) {
+            <li class="nav-item">
+              <a class="enlace" routerLink="/auditoria" routerLinkActive="activo" title="Auditoría">
+                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i
+                ><span class="etiqueta">Auditoría</span>
+              </a>
+            </li>
+          }
+        </ul>
+        <div class="usuario">
+          <span
+            class="avatar"
+            [title]="empleado.nombres + ' ' + empleado.apellidos + ', ' + empleado.sede"
+          >
+            <i class="fa-solid fa-user" aria-hidden="true"></i>
+          </span>
+          <span class="datos-usuario">
+            <span class="nombre">{{ empleado.nombres }} {{ empleado.apellidos }}</span>
+            <span class="detalle">{{ empleado.rol | estado }} - {{ empleado.sede }}</span>
+          </span>
+          <button
+            class="boton-salir"
+            type="button"
+            (click)="cerrarSesion()"
+            [title]="'Cerrar sesión de ' + empleado.usuario"
+          >
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+            <span class="texto-salir">Cerrar sesión</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+}
