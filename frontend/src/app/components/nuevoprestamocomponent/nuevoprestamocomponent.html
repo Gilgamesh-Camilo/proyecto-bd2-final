@@ -1,0 +1,186 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <a class="volver" routerLink="/prestamos"
+      ><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Préstamos</a
+    >
+    <h1>Nuevo préstamo</h1>
+  </div>
+</section>
+
+<section class="franja tono-crema" data-bs-theme="light" aria-label="Socio y ejemplar">
+  <div class="container">
+    <div class="row gx-4 gy-5">
+      <div class="col-lg-6">
+        <h2 class="subtitulo-franja"><span class="paso">1</span>Socio</h2>
+        <form (ngSubmit)="buscarSocio()" novalidate>
+          <label class="form-label" for="documento">Número de documento</label>
+          <div class="buscador">
+            <div class="campo-icono">
+              <i class="fa-solid fa-id-card icono-campo" aria-hidden="true"></i>
+              <input
+                id="documento"
+                name="documento"
+                type="text"
+                class="form-control"
+                placeholder="Ej. 1019283746"
+                [(ngModel)]="documento"
+                (ngModelChange)="errorDocumento = ''; socio = null"
+                [class.is-invalid]="errorDocumento !== ''"
+              />
+              <div class="invalid-feedback">{{ errorDocumento }}</div>
+            </div>
+            <button
+              class="boton-principal boton-icono"
+              type="submit"
+              [disabled]="buscandoSocio"
+              title="Buscar socio"
+              aria-label="Buscar socio"
+            >
+              @if (buscandoSocio) {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              } @else {
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              }
+            </button>
+          </div>
+
+          @if (socio) {
+            <div class="resultado-paso animate__animated animate__fadeIn">
+              <p class="principal mb-2">{{ socio.nombres }} {{ socio.apellidos }}</p>
+              <ul class="meta mb-3">
+                <li>
+                  <i class="fa-solid fa-id-card" aria-hidden="true"></i>{{ socio.tipoDocumento }}
+                  {{ socio.numeroDocumento }}
+                </li>
+                <li>
+                  <i class="fa-solid fa-user-tag" aria-hidden="true"></i>{{ socio.tipoSocio }}
+                </li>
+                <li>
+                  <i class="fa-solid fa-address-card" aria-hidden="true"></i
+                  >{{ socio.numeroCarne ?? 'Sin carné' }}
+                </li>
+              </ul>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="estado" [attr.data-estado]="socio.estado">{{
+                  socio.estado | estado
+                }}</span>
+                <span class="chip"
+                  ><i class="fa-solid fa-right-left" aria-hidden="true"></i
+                  >{{ socio.prestamosAbiertos }} abiertos</span
+                >
+                @if (socio.multasPendientes > 0) {
+                  <span class="estado" data-estado="PENDIENTE"
+                    >{{ socio.multasPendientes }} multas</span
+                  >
+                }
+              </div>
+              @if (socio.motivoBloqueo) {
+                <div class="alert alert-warning py-2 small mt-3 mb-0">
+                  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i
+                  >{{ socio.motivoBloqueo }}
+                </div>
+              }
+            </div>
+          }
+        </form>
+      </div>
+
+      <div class="col-lg-6">
+        <h2 class="subtitulo-franja"><span class="paso">2</span>Ejemplar</h2>
+        <form (ngSubmit)="buscarEjemplar()" novalidate>
+          <label class="form-label" for="codigo">Código de barras</label>
+          <div class="buscador">
+            <div class="campo-icono">
+              <i class="fa-solid fa-barcode icono-campo" aria-hidden="true"></i>
+              <input
+                id="codigo"
+                name="codigo"
+                type="text"
+                class="form-control"
+                placeholder="Ej. B-000103"
+                [(ngModel)]="codigo"
+                (ngModelChange)="errorCodigo = ''; ejemplar = null"
+                [class.is-invalid]="errorCodigo !== ''"
+              />
+              <div class="invalid-feedback">{{ errorCodigo }}</div>
+            </div>
+            <button
+              class="boton-principal boton-icono"
+              type="submit"
+              [disabled]="buscandoEjemplar"
+              title="Buscar ejemplar"
+              aria-label="Buscar ejemplar"
+            >
+              @if (buscandoEjemplar) {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              } @else {
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              }
+            </button>
+          </div>
+
+          @if (ejemplar) {
+            <div class="resultado-paso animate__animated animate__fadeIn">
+              <p class="principal mb-2">{{ ejemplar.titulo }}</p>
+              <ul class="meta mb-3">
+                <li>
+                  <i class="fa-solid fa-barcode" aria-hidden="true"></i>{{ ejemplar.codigoBarras }}
+                </li>
+                <li>
+                  <i class="fa-solid fa-location-dot" aria-hidden="true"></i>{{ ejemplar.sede }}
+                </li>
+              </ul>
+              <span class="estado" [attr.data-estado]="ejemplar.estado">{{
+                ejemplar.estado | estado
+              }}</span>
+              @if (ejemplarEnOtraSede()) {
+                <div class="alert alert-warning py-2 small mt-3 mb-0">
+                  <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>Está en
+                  {{ ejemplar.sede }}: solo lo presta esa sede. Puedes pedir un traslado.
+                </div>
+              }
+            </div>
+          }
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="franja tono-negro" aria-label="Confirmar el préstamo">
+  <div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div class="confirmacion">
+        @if (socio && ejemplar) {
+          <ul class="meta">
+            <li><i class="fa-solid fa-book" aria-hidden="true"></i>{{ ejemplar.titulo }}</li>
+            <li>
+              <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>{{ socio.nombres }}
+              {{ socio.apellidos }}
+            </li>
+          </ul>
+        } @else {
+          <span class="texto-suave">
+            <i class="fa-solid fa-list-check me-2" aria-hidden="true"></i>Completa los dos pasos.
+          </span>
+        }
+      </div>
+      <div class="d-flex gap-2">
+        <a class="boton-secundario" routerLink="/prestamos">Cancelar</a>
+        <button class="boton-principal" type="button" (click)="registrar()" [disabled]="guardando">
+          @if (guardando) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            Registrando...
+          } @else {
+            <i class="fa-solid fa-right-left" aria-hidden="true"></i>Registrar préstamo
+          }
+        </button>
+      </div>
+    </div>
+    @if (errorGuardar !== '') {
+      <div class="alert alert-danger mt-4 mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorGuardar }}
+      </div>
+    }
+  </div>
+</section>
