@@ -1,17 +1,22 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { Auditoriacomponent } from './components/auditoriacomponent/auditoriacomponent';
 import { Catalogocomponent } from './components/catalogocomponent/catalogocomponent';
 import { Detallelibrocomponent } from './components/detallelibrocomponent/detallelibrocomponent';
 import { Detallesociocomponent } from './components/detallesociocomponent/detallesociocomponent';
 import { Devolucioncomponent } from './components/devolucioncomponent/devolucioncomponent';
+import { Estadisticascomponent } from './components/estadisticascomponent/estadisticascomponent';
 import { Logincomponent } from './components/logincomponent/logincomponent';
+import { Multascomponent } from './components/multascomponent/multascomponent';
 import { Nuevareservacomponent } from './components/nuevareservacomponent/nuevareservacomponent';
 import { Nuevoprestamocomponent } from './components/nuevoprestamocomponent/nuevoprestamocomponent';
 import { Nuevosociocomponent } from './components/nuevosociocomponent/nuevosociocomponent';
+import { Nuevotrasladocomponent } from './components/nuevotrasladocomponent/nuevotrasladocomponent';
 import { Panelcomponent } from './components/panelcomponent/panelcomponent';
 import { Prestamoscomponent } from './components/prestamoscomponent/prestamoscomponent';
 import { Reservascomponent } from './components/reservascomponent/reservascomponent';
 import { Socioscomponent } from './components/socioscomponent/socioscomponent';
+import { Trasladoscomponent } from './components/trasladoscomponent/trasladoscomponent';
 import { SesionGuard } from './guards/sesion-guard';
 
 const routes: Routes = [
@@ -37,6 +42,25 @@ const routes: Routes = [
   { path: 'socios/:id', component: Detallesociocomponent, canActivate: [SesionGuard] },
   { path: 'reservas', component: Reservascomponent, canActivate: [SesionGuard] },
   { path: 'reservas/nueva', component: Nuevareservacomponent, canActivate: [SesionGuard] },
+  { path: 'multas', component: Multascomponent, canActivate: [SesionGuard] },
+  {
+    path: 'traslados',
+    component: Trasladoscomponent,
+    canActivate: [SesionGuard],
+  },
+  {
+    path: 'traslados/nuevo',
+    component: Nuevotrasladocomponent,
+    canActivate: [SesionGuard],
+    data: { roles: ['ADMINISTRADOR', 'BIBLIOTECARIO'] },
+  },
+  { path: 'estadisticas', component: Estadisticascomponent, canActivate: [SesionGuard] },
+  {
+    path: 'auditoria',
+    component: Auditoriacomponent,
+    canActivate: [SesionGuard],
+    data: { roles: ['ADMINISTRADOR'] },
+  },
   { path: '**', redirectTo: 'panel' },
 ];
 

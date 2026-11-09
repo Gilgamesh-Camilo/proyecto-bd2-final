@@ -1,0 +1,151 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <div class="encabezado-fila">
+      <h1>Traslados</h1>
+      @if (puedeGestionar) {
+        <div class="encabezado-acciones">
+          <a class="boton-principal" routerLink="/traslados/nuevo">
+            <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>Solicitar
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-traslados">
+  <div class="container">
+    <div class="franja-cabeza">
+      <h2 class="franja-titulo" id="titulo-traslados">Entre sedes</h2>
+      <div class="pestanas" role="group" aria-label="Estado">
+        <button
+          class="pestana"
+          type="button"
+          [class.activa]="estado === ''"
+          [attr.aria-pressed]="estado === ''"
+          (click)="estado = ''; cargar()"
+        >
+          Todos
+        </button>
+        @for (e of estados; track e) {
+          <button
+            class="pestana"
+            type="button"
+            [class.activa]="estado === e"
+            [attr.aria-pressed]="estado === e"
+            (click)="estado = e; cargar()"
+          >
+            {{ e | estado }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (errorEstado !== '') {
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorEstado }}
+      </div>
+    }
+    @if (mensaje !== '') {
+      <div class="alert alert-success alert-dismissible" role="status">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensaje }}
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="mensaje = ''"></button>
+      </div>
+    }
+    @if (errorAccion !== '') {
+      <div class="alert alert-danger alert-dismissible" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorAccion }}
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="errorAccion = ''"
+        ></button>
+      </div>
+    }
+
+    @if (cargando) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando
+        traslados...
+      </p>
+    } @else if (error !== '') {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ error }}
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Ejemplar</th>
+              <th scope="col">Ruta</th>
+              <th scope="col">Solicitado</th>
+              <th scope="col">Enviado</th>
+              <th scope="col">Recibido</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of traslados; track t.idTraslado) {
+              <tr>
+                <td>
+                  <div class="principal">{{ t.titulo }}</div>
+                  <div class="small texto-suave">{{ t.codigoBarras }}</div>
+                </td>
+                <td>
+                  <span class="text-nowrap">
+                    {{ t.sedeOrigen }}
+                    <i class="fa-solid fa-arrow-right mx-1 texto-suave" aria-hidden="true"></i
+                    ><span class="visually-hidden">a</span>
+                    {{ t.sedeDestino }}
+                  </span>
+                  @if (t.motivo) {
+                    <div class="small texto-suave">{{ t.motivo }}</div>
+                  }
+                </td>
+                <td>
+                  {{ t.fechaSolicitud | date: 'dd/MM/yyyy' }}
+                  <div class="small texto-suave">
+                    <i class="fa-solid fa-user me-1" aria-hidden="true"></i>{{ t.solicitadoPor }}
+                  </div>
+                </td>
+                <td>{{ t.fechaEnvio ? (t.fechaEnvio | date: 'dd/MM/yyyy') : '-' }}</td>
+                <td>{{ t.fechaRecepcion ? (t.fechaRecepcion | date: 'dd/MM/yyyy') : '-' }}</td>
+                <td>
+                  <span class="estado" [attr.data-estado]="t.estado">{{ t.estado | estado }}</span>
+                </td>
+                <td>
+                  <div class="acciones-fila">
+                    @if (accion(t) !== '') {
+                      <button
+                        class="boton-principal boton-pequeno"
+                        type="button"
+                        (click)="avanzar(t)"
+                        [disabled]="avanzando !== null"
+                      >
+                        @if (avanzando === t.idTraslado) {
+                          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                          Guardando...
+                        } @else {
+                          {{ accion(t) }}
+                        }
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="vacio">
+                  <i class="fa-solid fa-truck" aria-hidden="true"></i>Sin traslados con ese estado.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>

@@ -21,6 +21,11 @@ import { Nuevosociocomponent } from './components/nuevosociocomponent/nuevosocio
 import { Detallesociocomponent } from './components/detallesociocomponent/detallesociocomponent';
 import { Reservascomponent } from './components/reservascomponent/reservascomponent';
 import { Nuevareservacomponent } from './components/nuevareservacomponent/nuevareservacomponent';
+import { Multascomponent } from './components/multascomponent/multascomponent';
+import { Trasladoscomponent } from './components/trasladoscomponent/trasladoscomponent';
+import { Nuevotrasladocomponent } from './components/nuevotrasladocomponent/nuevotrasladocomponent';
+import { Estadisticascomponent } from './components/estadisticascomponent/estadisticascomponent';
+import { Auditoriacomponent } from './components/auditoriacomponent/auditoriacomponent';
 import { EstadoPipe } from './pipes/estado-pipe';
 
 registerLocaleData(localeEsCo);
@@ -43,6 +48,11 @@ registerLocaleData(localeEsCo);
     Detallesociocomponent,
     Reservascomponent,
     Nuevareservacomponent,
+    Multascomponent,
+    Trasladoscomponent,
+    Nuevotrasladocomponent,
+    Estadisticascomponent,
+    Auditoriacomponent,
     EstadoPipe,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule],

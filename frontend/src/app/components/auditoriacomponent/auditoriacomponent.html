@@ -1,0 +1,98 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <div class="encabezado-fila">
+      <div>
+        <h1>Auditoría</h1>
+        <ul class="meta mt-3">
+          <li>
+            <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>Últimos 100 cambios
+          </li>
+          <li>
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>Solo escriben los triggers
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-cambios">
+  <div class="container">
+    <div class="franja-cabeza">
+      <h2 class="franja-titulo" id="titulo-cambios">Cambios</h2>
+      <div class="campo-icono filtro-tabla">
+        <label class="visually-hidden" for="tabla">Tabla</label>
+        <i class="fa-solid fa-table icono-campo" aria-hidden="true"></i>
+        <select
+          id="tabla"
+          name="tabla"
+          class="form-select"
+          [(ngModel)]="tabla"
+          (ngModelChange)="cargar()"
+          [class.is-invalid]="errorTabla !== ''"
+        >
+          <option value="">Todas las tablas</option>
+          @for (t of tablas; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+        <div class="invalid-feedback">{{ errorTabla }}</div>
+      </div>
+    </div>
+
+    @if (cargando) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando
+        auditoría...
+      </p>
+    } @else if (error !== '') {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ error }}
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Tabla</th>
+              <th scope="col">Operación</th>
+              <th scope="col">Registro</th>
+              <th scope="col">Usuario</th>
+              <th scope="col">Antes</th>
+              <th scope="col">Después</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of registros; track r.idAuditoria) {
+              <tr>
+                <td>{{ r.idAuditoria }}</td>
+                <td class="text-nowrap">{{ r.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td class="principal">{{ r.tablaAfectada }}</td>
+                <td>
+                  <span class="chip">{{ r.operacion | estado }}</span>
+                </td>
+                <td>{{ r.claveRegistro }}</td>
+                <td class="small">{{ r.usuarioBd }}</td>
+                <td>
+                  <pre class="cambios">{{ r.antes || '-' }}</pre>
+                </td>
+                <td>
+                  <pre class="cambios">{{ r.despues || '-' }}</pre>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="vacio">
+                  <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>Sin cambios para esa
+                  tabla.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>
