@@ -1,0 +1,142 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <a class="volver" routerLink="/traslados"
+      ><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Traslados</a
+    >
+    <h1>Solicitar traslado</h1>
+  </div>
+</section>
+
+<form (ngSubmit)="registrar()" novalidate>
+  <section class="franja tono-crema" data-bs-theme="light" aria-label="Datos del traslado">
+    <div class="container">
+      @if (errorCarga !== '') {
+        <div class="alert alert-warning">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorCarga }}
+        </div>
+      }
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <label class="form-label" for="codigo">Código del ejemplar</label>
+          <div class="buscador">
+            <div class="campo-icono">
+              <i class="fa-solid fa-barcode icono-campo" aria-hidden="true"></i>
+              <input
+                id="codigo"
+                name="codigo"
+                type="text"
+                class="form-control"
+                placeholder="Ej. B-000104"
+                [(ngModel)]="codigo"
+                (ngModelChange)="errorCodigo = ''; ejemplar = null"
+                (keydown.enter)="$event.preventDefault(); buscarEjemplar()"
+                [class.is-invalid]="errorCodigo !== ''"
+              />
+              <div class="invalid-feedback">{{ errorCodigo }}</div>
+            </div>
+            <button
+              class="boton-principal boton-icono"
+              type="button"
+              (click)="buscarEjemplar()"
+              [disabled]="buscando"
+              title="Buscar ejemplar"
+              aria-label="Buscar ejemplar"
+            >
+              @if (buscando) {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              } @else {
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              }
+            </button>
+          </div>
+          @if (ejemplar) {
+            <div class="resultado-paso">
+              <span class="principal">{{ ejemplar.titulo }}</span>
+              <ul class="meta small mt-1 mb-2">
+                <li>
+                  <i class="fa-solid fa-location-dot" aria-hidden="true"></i>{{ ejemplar.sede }}
+                </li>
+              </ul>
+              <span class="estado" [attr.data-estado]="ejemplar.estado">{{
+                ejemplar.estado | estado
+              }}</span>
+              @if (ejemplar.estado !== 'DISPONIBLE') {
+                <div class="small texto-alerta mt-2">
+                  <i class="fa-solid fa-triangle-exclamation me-1" aria-hidden="true"></i>No está
+                  disponible: la base rechazará el traslado.
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="col-lg-3">
+          <label class="form-label" for="destino">Sede de destino</label>
+          <div class="campo-icono">
+            <i class="fa-solid fa-location-dot icono-campo" aria-hidden="true"></i>
+            <select
+              id="destino"
+              name="idSedeDestino"
+              class="form-select"
+              [(ngModel)]="idSedeDestino"
+              (ngModelChange)="errorSede = ''"
+              [class.is-invalid]="errorSede !== ''"
+            >
+              <option [ngValue]="null">Elige una sede</option>
+              @for (s of sedesDestino(); track s.idSede) {
+                <option [ngValue]="s.idSede">{{ s.nombre }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">{{ errorSede }}</div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <label class="form-label" for="motivo">
+            Motivo <span class="chip ms-1">Opcional</span>
+          </label>
+          <textarea
+            id="motivo"
+            name="motivo"
+            rows="3"
+            class="form-control"
+            placeholder="Ej. Reserva de un socio de Suba"
+            [(ngModel)]="motivo"
+            (ngModelChange)="errorMotivo = ''"
+            [class.is-invalid]="errorMotivo !== ''"
+          ></textarea>
+          <div class="invalid-feedback">{{ errorMotivo }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-negro" aria-label="Guardar">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <ul class="meta">
+          <li>
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>Solo se traslada un ejemplar
+            disponible
+          </li>
+        </ul>
+        <div class="d-flex gap-2">
+          <a class="boton-secundario" routerLink="/traslados">Cancelar</a>
+          <button class="boton-principal" type="submit" [disabled]="guardando">
+            @if (guardando) {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              Guardando...
+            } @else {
+              <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>Solicitar traslado
+            }
+          </button>
+        </div>
+      </div>
+      @if (errorGuardar !== '') {
+        <div class="alert alert-danger mt-4 mb-0" role="alert">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorGuardar }}
+        </div>
+      }
+    </div>
+  </section>
+</form>
