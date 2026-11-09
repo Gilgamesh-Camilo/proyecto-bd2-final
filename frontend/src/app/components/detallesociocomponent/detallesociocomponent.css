@@ -1,0 +1,31 @@
+:host {
+  display: block;
+}
+
+.ficha-socio {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--linea);
+}
+
+.listas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem 2rem;
+}
+
+.lista {
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--linea-titulo);
+}
+
+.lista h3 {
+  margin: 0;
+  color: var(--ambar);
+  font-size: 1.3rem;
+}
+
+.lista ul {
+  padding-left: 1.1rem;
+}

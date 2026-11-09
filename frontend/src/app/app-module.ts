@@ -13,6 +13,12 @@ import { Panelcomponent } from './components/panelcomponent/panelcomponent';
 import { Catalogocomponent } from './components/catalogocomponent/catalogocomponent';
 import { Tarjetalibrocomponent } from './components/tarjetalibrocomponent/tarjetalibrocomponent';
 import { Detallelibrocomponent } from './components/detallelibrocomponent/detallelibrocomponent';
+import { Prestamoscomponent } from './components/prestamoscomponent/prestamoscomponent';
+import { Nuevoprestamocomponent } from './components/nuevoprestamocomponent/nuevoprestamocomponent';
+import { Devolucioncomponent } from './components/devolucioncomponent/devolucioncomponent';
+import { Socioscomponent } from './components/socioscomponent/socioscomponent';
+import { Nuevosociocomponent } from './components/nuevosociocomponent/nuevosociocomponent';
+import { Detallesociocomponent } from './components/detallesociocomponent/detallesociocomponent';
 import { EstadoPipe } from './pipes/estado-pipe';
 
 registerLocaleData(localeEsCo);
@@ -27,6 +33,12 @@ registerLocaleData(localeEsCo);
     Catalogocomponent,
     Tarjetalibrocomponent,
     Detallelibrocomponent,
+    Prestamoscomponent,
+    Nuevoprestamocomponent,
+    Devolucioncomponent,
+    Socioscomponent,
+    Nuevosociocomponent,
+    Detallesociocomponent,
     EstadoPipe,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule],
