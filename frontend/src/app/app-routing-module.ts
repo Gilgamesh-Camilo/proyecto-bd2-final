@@ -9,10 +9,12 @@ import { Multascomponent } from './components/multascomponent/multascomponent';
 import { Nuevareservacomponent } from './components/nuevareservacomponent/nuevareservacomponent';
 import { Nuevoprestamocomponent } from './components/nuevoprestamocomponent/nuevoprestamocomponent';
 import { Nuevosociocomponent } from './components/nuevosociocomponent/nuevosociocomponent';
+import { Nuevotrasladocomponent } from './components/nuevotrasladocomponent/nuevotrasladocomponent';
 import { Panelcomponent } from './components/panelcomponent/panelcomponent';
 import { Prestamoscomponent } from './components/prestamoscomponent/prestamoscomponent';
 import { Reservascomponent } from './components/reservascomponent/reservascomponent';
 import { Socioscomponent } from './components/socioscomponent/socioscomponent';
+import { Trasladoscomponent } from './components/trasladoscomponent/trasladoscomponent';
 import { SesionGuard } from './guards/sesion-guard';
 
 const routes: Routes = [
@@ -39,6 +41,17 @@ const routes: Routes = [
   { path: 'reservas', component: Reservascomponent, canActivate: [SesionGuard] },
   { path: 'reservas/nueva', component: Nuevareservacomponent, canActivate: [SesionGuard] },
   { path: 'multas', component: Multascomponent, canActivate: [SesionGuard] },
+  {
+    path: 'traslados',
+    component: Trasladoscomponent,
+    canActivate: [SesionGuard],
+  },
+  {
+    path: 'traslados/nuevo',
+    component: Nuevotrasladocomponent,
+    canActivate: [SesionGuard],
+    data: { roles: ['ADMINISTRADOR', 'BIBLIOTECARIO'] },
+  },
   { path: '**', redirectTo: 'panel' },
 ];
 
