@@ -1,0 +1,159 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <div class="encabezado-fila">
+      <h1>Socios</h1>
+      @if (puedeInscribir) {
+        <div class="encabezado-acciones">
+          <a class="boton-principal" routerLink="/socios/nuevo">
+            <i class="fa-solid fa-user-plus" aria-hidden="true"></i>Inscribir
+          </a>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="franja tono-negro" aria-label="Buscar socios">
+  <div class="container">
+    <form class="buscador" (ngSubmit)="buscar()" novalidate>
+      <div class="campo-icono campo-grande">
+        <label class="visually-hidden" for="termino">Nombre, apellido o documento</label>
+        <i class="fa-solid fa-magnifying-glass icono-campo" aria-hidden="true"></i>
+        <input
+          id="termino"
+          name="termino"
+          type="text"
+          class="form-control"
+          placeholder="Nombre, apellido o documento"
+          [(ngModel)]="termino"
+          (ngModelChange)="errorTermino = ''"
+          [class.is-invalid]="errorTermino !== ''"
+        />
+        <div class="invalid-feedback">{{ errorTermino }}</div>
+      </div>
+      <button
+        class="boton-principal boton-icono grande"
+        type="submit"
+        title="Buscar"
+        aria-label="Buscar"
+      >
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      </button>
+    </form>
+    @if (mensaje !== '') {
+      <div class="alert alert-success alert-dismissible mt-4 mb-0" role="status">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensaje }}
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="mensaje = ''"></button>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-socios">
+  <div class="container">
+    <div class="franja-cabeza">
+      <h2 class="franja-titulo" id="titulo-socios">
+        {{ terminoBuscado === '' ? 'Todos' : 'Resultados' }}
+      </h2>
+      @if (!cargando && error === '') {
+        <span class="chip">
+          <i class="fa-solid fa-users" aria-hidden="true"></i>{{ socios.length }}
+        </span>
+      }
+    </div>
+    @if (cargando) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Buscando
+        socios...
+      </p>
+    } @else if (error !== '') {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ error }}
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Socio</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Carné</th>
+              <th scope="col">Estado</th>
+              <th scope="col" class="text-center" title="Préstamos abiertos">
+                <i class="fa-solid fa-right-left" aria-hidden="true"></i
+                ><span class="visually-hidden">Préstamos abiertos</span>
+              </th>
+              <th scope="col" class="text-center" title="Multas pendientes">
+                <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i
+                ><span class="visually-hidden">Multas pendientes</span>
+              </th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of socios; track s.idSocio) {
+              <tr>
+                <td>
+                  <div class="principal">{{ s.nombres }} {{ s.apellidos }}</div>
+                  @if (s.email) {
+                    <div class="small texto-suave">{{ s.email }}</div>
+                  }
+                </td>
+                <td class="text-nowrap">{{ s.tipoDocumento }} {{ s.numeroDocumento }}</td>
+                <td>{{ s.tipoSocio }}</td>
+                <td>
+                  @if (s.numeroCarne) {
+                    <div class="small mb-1">{{ s.numeroCarne }}</div>
+                    @if (s.estadoCarne) {
+                      <span class="estado" [attr.data-estado]="s.estadoCarne">{{
+                        s.estadoCarne | estado
+                      }}</span>
+                    }
+                  } @else {
+                    <span class="texto-suave">Sin carné</span>
+                  }
+                </td>
+                <td>
+                  <span class="estado" [attr.data-estado]="s.estado">{{ s.estado | estado }}</span>
+                  @if (s.motivoBloqueo) {
+                    <div class="small texto-alerta mt-1">{{ s.motivoBloqueo }}</div>
+                  }
+                </td>
+                <td class="text-center">{{ s.prestamosAbiertos }}</td>
+                <td class="text-center">
+                  @if (s.multasPendientes > 0) {
+                    <span class="estado" data-estado="PENDIENTE">{{ s.multasPendientes }}</span>
+                  } @else {
+                    0
+                  }
+                </td>
+                <td>
+                  <div class="acciones-fila">
+                    <a
+                      class="boton-principal boton-pequeno boton-icono"
+                      [routerLink]="['/socios', s.idSocio]"
+                      [title]="'Ver a ' + s.nombres + ' ' + s.apellidos"
+                      [attr.aria-label]="'Ver a ' + s.nombres + ' ' + s.apellidos"
+                    >
+                      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="vacio">
+                  <i class="fa-solid fa-user-slash" aria-hidden="true"></i>
+                  No hay socios{{
+                    terminoBuscado !== '' ? ' que coincidan con "' + terminoBuscado + '"' : ''
+                  }}.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>
