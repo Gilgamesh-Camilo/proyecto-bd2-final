@@ -1,0 +1,355 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <a class="volver" routerLink="/socios"
+      ><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Socios</a
+    >
+    @if (cargando) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando el
+        socio...
+      </p>
+    } @else if (error !== '') {
+      <div class="vacio">
+        <i class="fa-solid fa-user-slash" aria-hidden="true"></i>
+        {{ error }}
+        <div class="mt-3">
+          <a class="boton-secundario boton-pequeno" routerLink="/socios">
+            <i class="fa-solid fa-users" aria-hidden="true"></i>Ir a socios
+          </a>
+        </div>
+      </div>
+    } @else if (detalle) {
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="chip">{{ detalle.socio.tipoSocio }}</span>
+        <span class="estado" [attr.data-estado]="detalle.socio.estado">{{
+          detalle.socio.estado | estado
+        }}</span>
+      </div>
+      <div class="encabezado-fila">
+        <div>
+          <h1>{{ detalle.socio.nombres }} {{ detalle.socio.apellidos }}</h1>
+          <ul class="meta mt-3">
+            <li>
+              <i class="fa-solid fa-id-card" aria-hidden="true"></i
+              >{{ detalle.socio.tipoDocumento }} {{ detalle.socio.numeroDocumento }}
+            </li>
+            <li>
+              <i class="fa-solid fa-calendar-plus" aria-hidden="true"></i>Desde
+              {{ detalle.fechaRegistro | date: 'dd/MM/yyyy' }}
+            </li>
+          </ul>
+        </div>
+        <div class="encabezado-acciones">
+          <a
+            class="boton-principal"
+            routerLink="/prestamos/nuevo"
+            [queryParams]="{ documento: detalle.socio.numeroDocumento }"
+          >
+            <i class="fa-solid fa-right-left" aria-hidden="true"></i>Prestar
+          </a>
+          <a
+            class="boton-secundario"
+            routerLink="/reservas/nueva"
+            [queryParams]="{ documento: detalle.socio.numeroDocumento }"
+          >
+            <i class="fa-solid fa-bookmark" aria-hidden="true"></i>Reservar
+          </a>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+@if (!cargando && error === '' && detalle) {
+  <section class="franja tono-negro" aria-label="Estado del socio">
+    <div class="container">
+      @if (detalle.socio.motivoBloqueo) {
+        <div class="alert alert-warning mb-4">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>No puede llevar libros:
+          {{ detalle.socio.motivoBloqueo }}
+        </div>
+      }
+      <div class="resumen">
+        <div class="resumen-item">
+          <span class="resumen-icono"
+            ><i class="fa-solid fa-right-left" aria-hidden="true"></i
+          ></span>
+          <span>
+            <span class="resumen-valor">{{ prestamosAbiertos() }}/{{ detalle.maxPrestamos }}</span>
+            <span class="resumen-texto">préstamos abiertos</span>
+          </span>
+        </div>
+        <div class="resumen-item">
+          <span class="resumen-icono"
+            ><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i
+          ></span>
+          <span>
+            <span class="resumen-valor" [class.texto-alerta]="detalle.socio.multasPendientes > 0">{{
+              detalle.socio.multasPendientes
+            }}</span>
+            <span class="resumen-texto">multas pendientes</span>
+          </span>
+        </div>
+        <div class="resumen-item">
+          <span class="resumen-icono"
+            ><i class="fa-solid fa-calendar-days" aria-hidden="true"></i
+          ></span>
+          <span>
+            <span class="resumen-valor">{{ detalle.diasPrestamo }}</span>
+            <span class="resumen-texto">días por préstamo</span>
+          </span>
+        </div>
+        <div class="resumen-item">
+          <span class="resumen-icono"><i class="fa-solid fa-coins" aria-hidden="true"></i></span>
+          <span>
+            <span class="resumen-valor">$ {{ detalle.valorMultaDia | number: '1.0-0' }}</span>
+            <span class="resumen-texto">multa por día</span>
+          </span>
+        </div>
+      </div>
+
+      <dl class="datos ficha-socio">
+        <div>
+          <dt><i class="fa-solid fa-address-card" aria-hidden="true"></i>Carné</dt>
+          <dd>
+            @if (detalle.socio.numeroCarne) {
+              {{ detalle.socio.numeroCarne }}
+              @if (detalle.socio.estadoCarne) {
+                <span class="estado ms-1" [attr.data-estado]="detalle.socio.estadoCarne">{{
+                  detalle.socio.estadoCarne | estado
+                }}</span>
+              }
+            } @else {
+              Sin carné
+            }
+          </dd>
+        </div>
+        @if (detalle.socio.numeroCarne) {
+          <div>
+            <dt><i class="fa-solid fa-calendar-check" aria-hidden="true"></i>Expedido</dt>
+            <dd>{{ detalle.fechaExpedicion | date: 'dd/MM/yyyy' }}</dd>
+          </div>
+          <div>
+            <dt><i class="fa-solid fa-calendar-xmark" aria-hidden="true"></i>Vence</dt>
+            <dd>{{ detalle.fechaVencimiento | date: 'dd/MM/yyyy' }}</dd>
+          </div>
+        }
+        <div>
+          <dt><i class="fa-solid fa-envelope" aria-hidden="true"></i>Correo</dt>
+          <dd>{{ detalle.socio.email ?? 'Sin correo' }}</dd>
+        </div>
+        <div>
+          <dt><i class="fa-solid fa-phone" aria-hidden="true"></i>Teléfono</dt>
+          <dd>{{ detalle.socio.telefono ?? 'Sin teléfono' }}</dd>
+        </div>
+        <div>
+          <dt><i class="fa-solid fa-location-dot" aria-hidden="true"></i>Dirección</dt>
+          <dd>{{ detalle.direccion ?? 'Sin dirección' }}</dd>
+        </div>
+        <div>
+          <dt><i class="fa-solid fa-cake-candles" aria-hidden="true"></i>Nacimiento</dt>
+          <dd>{{ detalle.fechaNacimiento | date: 'dd/MM/yyyy' }}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-prestamos">
+    <div class="container">
+      <div class="franja-cabeza">
+        <h2 class="franja-titulo" id="titulo-prestamos">Préstamos</h2>
+        <span class="chip">
+          <i class="fa-solid fa-right-left" aria-hidden="true"></i>{{ detalle.prestamos.length }}
+        </span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Libro</th>
+              <th scope="col">Sede</th>
+              <th scope="col">Prestado</th>
+              <th scope="col">Límite</th>
+              <th scope="col">Devuelto</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of detalle.prestamos; track p.idPrestamo) {
+              <tr>
+                <td>
+                  <a class="principal" [routerLink]="['/catalogo', p.idLibro]">{{ p.titulo }}</a>
+                  <div class="small texto-suave">{{ p.codigoBarras }}</div>
+                </td>
+                <td>{{ p.sedePrestamo }}</td>
+                <td>{{ p.fechaPrestamo | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ p.fechaLimite | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ p.fechaDevolucion ? (p.fechaDevolucion | date: 'dd/MM/yyyy') : '-' }}</td>
+                <td>
+                  @if ((p.estado === 'ACTIVO' || p.estado === 'VENCIDO') && p.diasRetraso > 0) {
+                    <span class="estado" data-estado="VENCIDO">{{ p.diasRetraso }} días</span>
+                  } @else {
+                    <span class="estado" [attr.data-estado]="p.estado">{{
+                      p.estado | estado
+                    }}</span>
+                  }
+                </td>
+                <td>
+                  <div class="acciones-fila">
+                    @if (p.estado === 'ACTIVO' || p.estado === 'VENCIDO') {
+                      <a
+                        class="boton-principal boton-pequeno boton-icono"
+                        [routerLink]="['/prestamos', p.idPrestamo, 'devolucion']"
+                        [title]="'Devolver ' + p.codigoBarras"
+                        [attr.aria-label]="'Devolver ' + p.codigoBarras"
+                      >
+                        <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>
+                      </a>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="vacio">
+                  <i class="fa-solid fa-book-open" aria-hidden="true"></i>Todavía no ha llevado
+                  libros.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-crema" data-bs-theme="light" aria-label="Multas y reservas">
+    <div class="container">
+      <div class="row gx-4 gy-5">
+        <div class="col-lg-6">
+          <h2 class="subtitulo-franja">
+            <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>Multas
+          </h2>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Libro</th>
+                  <th scope="col">Motivo</th>
+                  <th scope="col">Valor</th>
+                  <th scope="col">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (m of detalle.multas; track m.idPrestamo) {
+                  <tr>
+                    <td>
+                      {{ m.titulo }}
+                      <div class="small texto-suave">
+                        {{ m.fechaGeneracion | date: 'dd/MM/yyyy' }}
+                      </div>
+                    </td>
+                    <td>{{ m.motivo | estado }}</td>
+                    <td class="text-nowrap">$ {{ m.valor | number: '1.0-0' }}</td>
+                    <td>
+                      <span class="estado" [attr.data-estado]="m.estado">{{
+                        m.estado | estado
+                      }}</span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4" class="vacio">
+                      <i class="fa-solid fa-circle-check" aria-hidden="true"></i>Sin multas.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <h2 class="subtitulo-franja">
+            <i class="fa-solid fa-bookmark" aria-hidden="true"></i>Reservas
+          </h2>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Libro</th>
+                  <th scope="col">Retiro</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (r of detalle.reservas; track r.idReserva) {
+                  <tr>
+                    <td>{{ r.titulo }}</td>
+                    <td>{{ r.sedeRetiro }}</td>
+                    <td>{{ r.fechaReserva | date: 'dd/MM/yyyy' }}</td>
+                    <td>
+                      <span class="estado" [attr.data-estado]="r.estado">{{
+                        r.estado | estado
+                      }}</span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4" class="vacio">
+                      <i class="fa-regular fa-bookmark" aria-hidden="true"></i>Sin reservas.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-cafe" aria-labelledby="titulo-listas">
+    <div class="container">
+      <h2 class="franja-titulo mb-4" id="titulo-listas">
+        <i class="fa-solid fa-list-ul" aria-hidden="true"></i>Listas de lectura
+      </h2>
+      @if (detalle.listasLectura === null) {
+        <p class="texto-suave mb-0">
+          <i class="fa-solid fa-plug-circle-xmark me-2" aria-hidden="true"></i>MongoDB no respondió.
+        </p>
+      } @else {
+        <div class="listas">
+          @for (l of detalle.listasLectura; track l.id) {
+            <article class="lista">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <h3>{{ l.nombre }}</h3>
+                <span class="texto-suave" [title]="l.publica ? 'Pública' : 'Privada'">
+                  <i
+                    class="fa-solid"
+                    [class.fa-globe]="l.publica"
+                    [class.fa-lock]="!l.publica"
+                    aria-hidden="true"
+                  ></i>
+                  <span class="visually-hidden">{{ l.publica ? 'Pública' : 'Privada' }}</span>
+                </span>
+              </div>
+              <ul>
+                @for (t of l.libros; track $index) {
+                  <li>{{ t }}</li>
+                }
+              </ul>
+              <p class="texto-suave small mb-0">
+                <i class="fa-solid fa-circle-check me-1" aria-hidden="true"></i>{{ l.leidos }} de
+                {{ l.libros.length }} leídos
+              </p>
+            </article>
+          } @empty {
+            <p class="texto-suave mb-0">Sin listas de lectura.</p>
+          }
+        </div>
+      }
+    </div>
+  </section>
+}

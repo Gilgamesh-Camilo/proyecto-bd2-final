@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.reglas {
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1rem 1.25rem;
+  background: var(--campo);
+  border: 1px solid var(--linea);
+  border-radius: 18px;
+  color: var(--texto);
+}
+
+.reglas i {
+  width: 1.1rem;
+  color: var(--acento);
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .reglas {
+    margin-top: 1.9rem;
+  }
+}

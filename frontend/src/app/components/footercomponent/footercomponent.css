@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.pie {
+  padding: 1.5rem 0;
+  background: var(--negro);
+  border-top: 1px solid rgba(244, 244, 241, 0.2);
+  color: var(--blanco);
+  font-size: 0.9rem;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.marca i {
+  color: var(--arena);
+}

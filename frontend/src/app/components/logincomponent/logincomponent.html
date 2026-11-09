@@ -1,0 +1,133 @@
+<section class="acceso encabezado-pagina">
+  <div class="container">
+    <div class="row gx-4 gy-5 align-items-center">
+      <div class="col-lg-6 animate__animated animate__fadeIn">
+        <p class="marca-acceso"><i class="fa-solid fa-book" aria-hidden="true"></i>BiblioRed</p>
+        <h1>Circulación de libros entre sedes</h1>
+        <ul class="ventajas">
+          <li>
+            <span class="resumen-icono"
+              ><i class="fa-solid fa-database" aria-hidden="true"></i
+            ></span>
+            Reglas de préstamo en PostgreSQL
+          </li>
+          <li>
+            <span class="resumen-icono"><i class="fa-solid fa-leaf" aria-hidden="true"></i></span>
+            Fichas, reseñas y búsquedas en MongoDB
+          </li>
+          <li>
+            <span class="resumen-icono"
+              ><i class="fa-solid fa-user-shield" aria-hidden="true"></i
+            ></span>
+            Cada rol ve lo suyo
+          </li>
+        </ul>
+      </div>
+
+      <div class="col-12 col-md-9 col-lg-5 offset-lg-1">
+        <div class="panel tono-crema animate__animated animate__fadeInUp" data-bs-theme="light">
+          <h2 class="subtitulo-franja">
+            <i class="fa-solid fa-lock" aria-hidden="true"></i>Iniciar sesión
+          </h2>
+          <form (ngSubmit)="iniciarSesion()" novalidate>
+            <div class="mb-3">
+              <label class="form-label" for="usuario">Usuario</label>
+              <div class="campo-icono">
+                <i class="fa-solid fa-user icono-campo" aria-hidden="true"></i>
+                <input
+                  id="usuario"
+                  name="usuario"
+                  type="text"
+                  class="form-control"
+                  placeholder="Ej. hpinilla"
+                  autocomplete="username"
+                  [(ngModel)]="usuario"
+                  (ngModelChange)="errorUsuario = ''"
+                  [class.is-invalid]="errorUsuario !== ''"
+                />
+                <div class="invalid-feedback">{{ errorUsuario }}</div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label" for="contrasena">Contraseña</label>
+              <div class="campo-icono">
+                <i class="fa-solid fa-key icono-campo" aria-hidden="true"></i>
+                <input
+                  id="contrasena"
+                  name="contrasena"
+                  class="form-control campo-clave"
+                  autocomplete="current-password"
+                  [type]="verContrasena ? 'text' : 'password'"
+                  [(ngModel)]="contrasena"
+                  (ngModelChange)="errorContrasena = ''"
+                  [class.is-invalid]="errorContrasena !== ''"
+                />
+                <button
+                  class="ver-clave"
+                  type="button"
+                  (click)="verContrasena = !verContrasena"
+                  [attr.aria-label]="verContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                  [title]="verContrasena ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                >
+                  <i
+                    class="fa-solid"
+                    [class.fa-eye]="!verContrasena"
+                    [class.fa-eye-slash]="verContrasena"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+                <div class="invalid-feedback">{{ errorContrasena }}</div>
+              </div>
+            </div>
+
+            @if (mensaje !== '') {
+              <div class="alert alert-danger py-2" role="alert">
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ mensaje }}
+              </div>
+            }
+
+            <button class="boton-principal w-100" type="submit" [disabled]="enviando">
+              @if (enviando) {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                Validando...
+              } @else {
+                <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>Entrar
+              }
+            </button>
+          </form>
+
+          <ul class="meta servidor" aria-label="Estado del servidor">
+            @if (estadoServidor) {
+              <li>
+                <i class="fa-solid fa-database" aria-hidden="true"></i>PostgreSQL
+                <span
+                  class="estado"
+                  [attr.data-estado]="estadoServidor.postgresql ? 'ACTIVA' : 'SUSPENDIDO'"
+                  >{{ estadoServidor.postgresql ? 'En línea' : 'Sin conexión' }}</span
+                >
+              </li>
+              <li>
+                <i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB
+                <span
+                  class="estado"
+                  [attr.data-estado]="estadoServidor.mongodb ? 'ACTIVA' : 'SUSPENDIDO'"
+                  >{{ estadoServidor.mongodb ? 'En línea' : 'Sin conexión' }}</span
+                >
+              </li>
+            } @else if (errorServidor !== '') {
+              <li class="texto-alerta">
+                <i class="fa-solid fa-plug-circle-xmark" aria-hidden="true"></i>{{ errorServidor }}
+              </li>
+            } @else {
+              <li>
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>Consultando
+                el servidor...
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

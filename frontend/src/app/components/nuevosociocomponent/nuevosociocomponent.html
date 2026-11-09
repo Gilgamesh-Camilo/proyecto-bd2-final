@@ -1,0 +1,222 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <a class="volver" routerLink="/socios"
+      ><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Socios</a
+    >
+    <h1>Inscribir socio</h1>
+  </div>
+</section>
+
+<form (ngSubmit)="registrar()" novalidate>
+  <section class="franja tono-crema" data-bs-theme="light" aria-label="Datos del socio">
+    <div class="container">
+      @if (errorCatalogos !== '') {
+        <div class="alert alert-warning">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>No se cargaron los
+          tipos de socio: {{ errorCatalogos }}
+        </div>
+      }
+      <h2 class="subtitulo-franja">
+        <i class="fa-solid fa-id-card" aria-hidden="true"></i>Identificación
+      </h2>
+      <div class="row g-3 mb-5">
+        <div class="col-md-4">
+          <label class="form-label" for="tipo-documento">Tipo de documento</label>
+          <select
+            id="tipo-documento"
+            name="tipoDocumento"
+            class="form-select"
+            [(ngModel)]="tipoDocumento"
+            (ngModelChange)="errorTipoDocumento = ''"
+            [class.is-invalid]="errorTipoDocumento !== ''"
+          >
+            @for (t of tiposDocumento; track t) {
+              <option [value]="t">{{ nombreDocumento(t) }}</option>
+            }
+          </select>
+          <div class="invalid-feedback">{{ errorTipoDocumento }}</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="numero-documento">Número de documento</label>
+          <input
+            id="numero-documento"
+            name="numeroDocumento"
+            type="text"
+            class="form-control"
+            placeholder="Ej. 1023947765"
+            [(ngModel)]="numeroDocumento"
+            (ngModelChange)="errorNumeroDocumento = ''"
+            [class.is-invalid]="errorNumeroDocumento !== ''"
+          />
+          <div class="invalid-feedback">{{ errorNumeroDocumento }}</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="fecha-nacimiento">Fecha de nacimiento</label>
+          <input
+            id="fecha-nacimiento"
+            name="fechaNacimiento"
+            type="date"
+            class="form-control"
+            [max]="hoy"
+            [(ngModel)]="fechaNacimiento"
+            (ngModelChange)="errorFechaNacimiento = ''"
+            [class.is-invalid]="errorFechaNacimiento !== ''"
+          />
+          <div class="invalid-feedback">{{ errorFechaNacimiento }}</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="nombres">Nombres</label>
+          <input
+            id="nombres"
+            name="nombres"
+            type="text"
+            class="form-control"
+            placeholder="Ej. Ximena Lucía"
+            [(ngModel)]="nombres"
+            (ngModelChange)="errorNombres = ''"
+            [class.is-invalid]="errorNombres !== ''"
+          />
+          <div class="invalid-feedback">{{ errorNombres }}</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="apellidos">Apellidos</label>
+          <input
+            id="apellidos"
+            name="apellidos"
+            type="text"
+            class="form-control"
+            placeholder="Ej. Barrera Quintero"
+            [(ngModel)]="apellidos"
+            (ngModelChange)="errorApellidos = ''"
+            [class.is-invalid]="errorApellidos !== ''"
+          />
+          <div class="invalid-feedback">{{ errorApellidos }}</div>
+        </div>
+      </div>
+
+      <h2 class="subtitulo-franja">
+        <i class="fa-solid fa-address-book" aria-hidden="true"></i>Contacto
+        <span class="chip">Opcional</span>
+      </h2>
+      <div class="row g-3 mb-5">
+        <div class="col-md-6">
+          <label class="form-label" for="email">Correo</label>
+          <div class="campo-icono">
+            <i class="fa-solid fa-envelope icono-campo" aria-hidden="true"></i>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              class="form-control"
+              placeholder="Ej. xbarrera@correo.co"
+              [(ngModel)]="email"
+              (ngModelChange)="errorEmail = ''"
+              [class.is-invalid]="errorEmail !== ''"
+            />
+            <div class="invalid-feedback">{{ errorEmail }}</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="telefono">Teléfono</label>
+          <div class="campo-icono">
+            <i class="fa-solid fa-phone icono-campo" aria-hidden="true"></i>
+            <input
+              id="telefono"
+              name="telefono"
+              type="tel"
+              class="form-control"
+              placeholder="Ej. 3157781204"
+              [(ngModel)]="telefono"
+              (ngModelChange)="errorTelefono = ''"
+              [class.is-invalid]="errorTelefono !== ''"
+            />
+            <div class="invalid-feedback">{{ errorTelefono }}</div>
+          </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="direccion">Dirección</label>
+          <div class="campo-icono">
+            <i class="fa-solid fa-location-dot icono-campo" aria-hidden="true"></i>
+            <input
+              id="direccion"
+              name="direccion"
+              type="text"
+              class="form-control"
+              placeholder="Ej. Cra 13 # 63-40, Chapinero"
+              [(ngModel)]="direccion"
+              (ngModelChange)="errorDireccion = ''"
+              [class.is-invalid]="errorDireccion !== ''"
+            />
+            <div class="invalid-feedback">{{ errorDireccion }}</div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="subtitulo-franja">
+        <i class="fa-solid fa-user-tag" aria-hidden="true"></i>Membresía
+      </h2>
+      <div class="row g-3 align-items-start">
+        <div class="col-md-6">
+          <label class="form-label" for="tipo-socio">Tipo de socio</label>
+          <select
+            id="tipo-socio"
+            name="idTipoSocio"
+            class="form-select"
+            [(ngModel)]="idTipoSocio"
+            (ngModelChange)="errorTipoSocio = ''"
+            [class.is-invalid]="errorTipoSocio !== ''"
+          >
+            <option [ngValue]="null">Elige un tipo</option>
+            @for (t of tiposSocio; track t.idTipoSocio) {
+              <option [ngValue]="t.idTipoSocio">{{ t.nombre }}</option>
+            }
+          </select>
+          <div class="invalid-feedback">{{ errorTipoSocio }}</div>
+        </div>
+        <div class="col-md-6">
+          @if (tipoSeleccionado(); as tipo) {
+            <ul class="meta reglas">
+              <li>
+                <i class="fa-solid fa-book" aria-hidden="true"></i>Hasta
+                {{ tipo.maxPrestamos }} libros
+              </li>
+              <li>
+                <i class="fa-solid fa-calendar-days" aria-hidden="true"></i
+                >{{ tipo.diasPrestamo }} días por préstamo
+              </li>
+              <li>
+                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i
+                >{{ tipo.maxRenovaciones }} renovaciones
+              </li>
+              <li>
+                <i class="fa-solid fa-coins" aria-hidden="true"></i>$
+                {{ tipo.valorMultaDia | number: '1.0-0' }} de multa por día
+              </li>
+            </ul>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-negro" aria-label="Guardar">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-end align-items-center gap-2">
+        <a class="boton-secundario" routerLink="/socios">Cancelar</a>
+        <button class="boton-principal" type="submit" [disabled]="guardando">
+          @if (guardando) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            Guardando...
+          } @else {
+            <i class="fa-solid fa-user-plus" aria-hidden="true"></i>Inscribir socio
+          }
+        </button>
+      </div>
+      @if (errorGuardar !== '') {
+        <div class="alert alert-danger mt-4 mb-0" role="alert">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorGuardar }}
+        </div>
+      }
+    </div>
+  </section>
+</form>

@@ -1,0 +1,156 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <a class="volver" routerLink="/reservas"
+      ><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Reservas</a
+    >
+    <h1>Nueva reserva</h1>
+  </div>
+</section>
+
+<form (ngSubmit)="registrar()" novalidate>
+  <section class="franja tono-crema" data-bs-theme="light" aria-label="Datos de la reserva">
+    <div class="container">
+      @if (errorCarga !== '') {
+        <div class="alert alert-warning">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorCarga }}
+        </div>
+      }
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <label class="form-label" for="documento">Documento del socio</label>
+          <div class="buscador">
+            <div class="campo-icono">
+              <i class="fa-solid fa-id-card icono-campo" aria-hidden="true"></i>
+              <input
+                id="documento"
+                name="documento"
+                type="text"
+                class="form-control"
+                placeholder="Ej. 1019283746"
+                [(ngModel)]="documento"
+                (ngModelChange)="errorDocumento = ''; socio = null"
+                (keydown.enter)="$event.preventDefault(); buscarSocio()"
+                [class.is-invalid]="errorDocumento !== ''"
+              />
+              <div class="invalid-feedback">{{ errorDocumento }}</div>
+            </div>
+            <button
+              class="boton-principal boton-icono"
+              type="button"
+              (click)="buscarSocio()"
+              [disabled]="buscandoSocio"
+              title="Buscar socio"
+              aria-label="Buscar socio"
+            >
+              @if (buscandoSocio) {
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              } @else {
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              }
+            </button>
+          </div>
+          @if (socio) {
+            <div class="resultado-paso">
+              <span class="principal">{{ socio.nombres }} {{ socio.apellidos }}</span>
+              <ul class="meta small mt-1">
+                <li>
+                  <i class="fa-solid fa-user-tag" aria-hidden="true"></i>{{ socio.tipoSocio }}
+                </li>
+                <li>
+                  <i class="fa-solid fa-address-card" aria-hidden="true"></i
+                  >{{ socio.numeroCarne ?? 'Sin carné' }}
+                </li>
+              </ul>
+              @if (socio.motivoBloqueo) {
+                <div class="small texto-alerta mt-2">
+                  <i class="fa-solid fa-triangle-exclamation me-1" aria-hidden="true"></i
+                  >{{ socio.motivoBloqueo }}
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="col-lg-5">
+          <label class="form-label" for="libro">Libro</label>
+          <div class="campo-icono">
+            <i class="fa-solid fa-book icono-campo" aria-hidden="true"></i>
+            <select
+              id="libro"
+              name="idLibro"
+              class="form-select"
+              [(ngModel)]="idLibro"
+              (ngModelChange)="errorLibro = ''"
+              [class.is-invalid]="errorLibro !== ''"
+            >
+              <option [ngValue]="null">Elige un libro</option>
+              @for (l of libros; track l.idLibro) {
+                <option [ngValue]="l.idLibro">{{ l.titulo }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">{{ errorLibro }}</div>
+          </div>
+          @if (libroSeleccionado(); as libro) {
+            <ul class="meta small mt-2">
+              <li><i class="fa-solid fa-feather" aria-hidden="true"></i>{{ libro.autores }}</li>
+              <li>
+                <i class="fa-solid fa-circle-check" aria-hidden="true"></i
+                >{{ libro.disponibles }}/{{ libro.totalEjemplares }} libres en la red
+              </li>
+            </ul>
+          }
+        </div>
+
+        <div class="col-lg-3">
+          <label class="form-label" for="sede">Sede de retiro</label>
+          <div class="campo-icono">
+            <i class="fa-solid fa-location-dot icono-campo" aria-hidden="true"></i>
+            <select
+              id="sede"
+              name="idSede"
+              class="form-select"
+              [(ngModel)]="idSede"
+              (ngModelChange)="errorSede = ''"
+              [class.is-invalid]="errorSede !== ''"
+            >
+              <option [ngValue]="null">Elige una sede</option>
+              @for (s of sedes; track s.idSede) {
+                <option [ngValue]="s.idSede">{{ s.nombre }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">{{ errorSede }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-negro" aria-label="Guardar">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <ul class="meta">
+          <li>
+            <i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>Si hay ejemplar libre, se
+            aparta 3 días
+          </li>
+        </ul>
+        <div class="d-flex gap-2">
+          <a class="boton-secundario" routerLink="/reservas">Cancelar</a>
+          <button class="boton-principal" type="submit" [disabled]="guardando">
+            @if (guardando) {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              Guardando...
+            } @else {
+              <i class="fa-solid fa-bookmark" aria-hidden="true"></i>Crear reserva
+            }
+          </button>
+        </div>
+      </div>
+      @if (errorGuardar !== '') {
+        <div class="alert alert-danger mt-4 mb-0" role="alert">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorGuardar }}
+        </div>
+      }
+    </div>
+  </section>
+</form>
