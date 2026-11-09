@@ -1,0 +1,89 @@
+:host {
+  display: block;
+}
+
+.subtitulo-libro {
+  margin: 0.6rem 0 0;
+  color: var(--texto-suave);
+  font-size: 1.3rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.estrellas {
+  gap: 0.2rem;
+  color: var(--ambar);
+}
+
+.estrellas strong {
+  margin-left: 0.35rem;
+  color: var(--texto);
+}
+
+.estrellas span {
+  color: var(--texto-suave);
+}
+
+.mi-sede > td {
+  background: rgba(244, 244, 241, 0.28);
+}
+
+.datos-libro {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sinopsis {
+  max-width: 70ch;
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.subtitulo-ficha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--linea-titulo);
+  font-size: 1rem;
+}
+
+.subtitulo-ficha i {
+  color: var(--acento);
+}
+
+.etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lista-simple {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.lista-simple li {
+  margin-bottom: 0.3rem;
+}
+
+.resena {
+  padding: 1.1rem 0;
+  border-top: 1px solid var(--linea-titulo);
+}
+
+.resena h3 {
+  margin: 0.4rem 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+@media (min-width: 992px) {
+  .formulario-resena {
+    position: sticky;
+    top: 1rem;
+  }
+}

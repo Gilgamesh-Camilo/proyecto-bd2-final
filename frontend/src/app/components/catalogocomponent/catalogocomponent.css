@@ -1,0 +1,54 @@
+:host {
+  display: block;
+}
+
+.campo-termino {
+  flex: 3 1 320px;
+}
+
+.buscador > .campo-filtro {
+  flex: 1 1 210px;
+}
+
+.ranking {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ranking li {
+  display: flex;
+  gap: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--linea-titulo);
+}
+
+.puesto {
+  font-size: 2.5rem;
+  font-weight: 650;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+}
+
+.terminos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem 2rem;
+}
+
+.termino {
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--linea-titulo);
+}
+
+.termino-texto {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--ambar);
+  font-size: 1.6rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}

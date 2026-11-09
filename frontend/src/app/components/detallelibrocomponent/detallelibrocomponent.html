@@ -1,0 +1,485 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <a class="volver" routerLink="/catalogo"
+      ><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Catálogo</a
+    >
+    @if (cargando && !libro) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando el
+        libro...
+      </p>
+    } @else if (error !== '' && !libro) {
+      <div class="vacio">
+        <i class="fa-solid fa-book-skull" aria-hidden="true"></i>
+        {{ error }}
+        <div class="mt-3">
+          <a class="boton-secundario boton-pequeno" routerLink="/catalogo">
+            <i class="fa-solid fa-book" aria-hidden="true"></i>Ir al catálogo
+          </a>
+        </div>
+      </div>
+    }
+    @if (libro) {
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <span class="chip">{{ libro.categoria }}</span>
+        <span class="chip">Dewey {{ libro.codigoDewey }}</span>
+        @if (libro.ficha && libro.ficha.nivel !== '') {
+          <span class="chip">Nivel {{ libro.ficha.nivel }}</span>
+        }
+      </div>
+      <div class="encabezado-fila">
+        <div>
+          <h1>{{ libro.titulo }}</h1>
+          @if (libro.subtitulo) {
+            <p class="subtitulo-libro">{{ libro.subtitulo }}</p>
+          }
+          <ul class="meta mt-3">
+            <li><i class="fa-solid fa-feather" aria-hidden="true"></i>{{ nombreAutores() }}</li>
+            @if (
+              libro.calificacion &&
+              libro.calificacion.total > 0 &&
+              libro.calificacion.promedio !== null
+            ) {
+              <li class="estrellas">
+                @for (n of estrellas; track n) {
+                  <i
+                    aria-hidden="true"
+                    [class]="
+                      n <= libro.calificacion.promedio + 0.25
+                        ? 'fa-solid fa-star'
+                        : 'fa-regular fa-star'
+                    "
+                  ></i>
+                }
+                <strong>{{ libro.calificacion.promedio | number: '1.1-1' }}</strong>
+                <span>({{ libro.calificacion.total }} reseñas)</span>
+              </li>
+            }
+          </ul>
+        </div>
+        <div class="encabezado-acciones">
+          <a
+            class="boton-principal"
+            routerLink="/reservas/nueva"
+            [queryParams]="{ libro: libro.idLibro }"
+          >
+            <i class="fa-solid fa-bookmark" aria-hidden="true"></i>Reservar
+          </a>
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+@if (libro) {
+  <section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-ejemplares">
+    <div class="container">
+      <div class="row gx-4 gy-5">
+        <div class="col-lg-8">
+          <div class="franja-cabeza">
+            <h2 class="franja-titulo" id="titulo-ejemplares">Ejemplares</h2>
+            <span class="chip">
+              <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+              {{ disponiblesEnMiSede() }}
+              {{ disponiblesEnMiSede() === 1 ? 'libre' : 'libres' }} en tu sede
+            </span>
+          </div>
+          @if (libro.ejemplares.length === 0) {
+            <div class="vacio">
+              <i class="fa-solid fa-box-open" aria-hidden="true"></i>
+              Sin ejemplares registrados.
+            </div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Código</th>
+                    <th scope="col">Sede</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col"><span class="visually-hidden">Acciones</span></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (e of libro.ejemplares; track e.idEjemplar) {
+                    <tr [class.mi-sede]="esDeMiSede(e.idSede)">
+                      <td>
+                        <div class="principal">{{ e.codigoBarras }}</div>
+                        @if (e.ubicacionEstante) {
+                          <div class="small texto-suave">{{ e.ubicacionEstante }}</div>
+                        }
+                      </td>
+                      <td>
+                        {{ e.sede }}
+                        @if (esDeMiSede(e.idSede)) {
+                          <span class="chip ms-1">Tu sede</span>
+                        }
+                      </td>
+                      <td>
+                        <span class="estado" [attr.data-estado]="e.estado">{{
+                          e.estado | estado
+                        }}</span>
+                      </td>
+                      <td>
+                        <div class="acciones-fila">
+                          @if (e.estado === 'DISPONIBLE' && esDeMiSede(e.idSede)) {
+                            <a
+                              class="boton-principal boton-pequeno boton-icono"
+                              routerLink="/prestamos/nuevo"
+                              [queryParams]="{ codigo: e.codigoBarras }"
+                              [title]="'Prestar ' + e.codigoBarras"
+                              [attr.aria-label]="'Prestar ' + e.codigoBarras"
+                            >
+                              <i class="fa-solid fa-right-left" aria-hidden="true"></i>
+                            </a>
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+
+        <div class="col-lg-4">
+          <h2 class="subtitulo-franja">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>Datos
+          </h2>
+          <dl class="datos datos-libro">
+            <div>
+              <dt>ISBN</dt>
+              <dd>{{ libro.isbn }}</dd>
+            </div>
+            <div>
+              <dt>Editorial</dt>
+              <dd>
+                {{ libro.editorial
+                }}{{ libro.paisEditorial ? ' (' + libro.paisEditorial + ')' : '' }}
+              </dd>
+            </div>
+            <div>
+              <dt>Año</dt>
+              <dd>{{ libro.anioPublicacion ?? 'Sin dato' }}</dd>
+            </div>
+            <div>
+              <dt>Edición</dt>
+              <dd>{{ libro.edicion }}</dd>
+            </div>
+            <div>
+              <dt>Páginas</dt>
+              <dd>{{ libro.numeroPaginas ?? 'Sin dato' }}</dd>
+            </div>
+            <div>
+              <dt>Idioma</dt>
+              <dd>{{ libro.idioma }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-crema" data-bs-theme="light" aria-labelledby="titulo-ficha">
+    <div class="container">
+      <h2 class="franja-titulo mb-4" id="titulo-ficha">
+        <i class="fa-solid fa-leaf" aria-hidden="true"></i>Ficha
+      </h2>
+      @if (libro.ficha) {
+        @if (libro.ficha.sinopsis !== '') {
+          <p class="sinopsis">{{ libro.ficha.sinopsis }}</p>
+        }
+        <div class="row g-4 mt-1">
+          @if (libro.ficha.palabrasClave.length > 0) {
+            <div class="col-md-6 col-lg-3">
+              <h3 class="subtitulo-ficha">
+                <i class="fa-solid fa-tags" aria-hidden="true"></i>Palabras clave
+              </h3>
+              <ul class="etiquetas">
+                @for (p of libro.ficha.palabrasClave; track p) {
+                  <li class="chip">{{ p }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (libro.ficha.capitulos.length > 0) {
+            <div class="col-md-6 col-lg-3">
+              <h3 class="subtitulo-ficha">
+                <i class="fa-solid fa-list-ol" aria-hidden="true"></i>Contenido
+              </h3>
+              <ul class="lista-simple">
+                @for (c of libro.ficha.capitulos; track c) {
+                  <li>{{ c }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (libro.ficha.premios.length > 0) {
+            <div class="col-md-6 col-lg-3">
+              <h3 class="subtitulo-ficha">
+                <i class="fa-solid fa-award" aria-hidden="true"></i>Premios
+              </h3>
+              <ul class="lista-simple">
+                @for (p of libro.ficha.premios; track p) {
+                  <li>{{ p }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (libro.ficha.adaptaciones.length > 0) {
+            <div class="col-md-6 col-lg-3">
+              <h3 class="subtitulo-ficha">
+                <i class="fa-solid fa-film" aria-hidden="true"></i>Adaptaciones
+              </h3>
+              <ul class="lista-simple">
+                @for (a of libro.ficha.adaptaciones; track a) {
+                  <li>{{ a }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="texto-suave mb-0">
+          <i class="fa-solid fa-circle-info me-2" aria-hidden="true"></i>Sin ficha: el libro no
+          tiene una o MongoDB no respondió.
+        </p>
+      }
+    </div>
+  </section>
+
+  <section class="franja tono-cafe" aria-labelledby="titulo-resenas">
+    <div class="container">
+      <h2 class="franja-titulo mb-4" id="titulo-resenas">
+        <i class="fa-solid fa-comments" aria-hidden="true"></i>Reseñas
+      </h2>
+      @if (mensajeResena !== '') {
+        <div class="alert alert-success" role="status">
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensajeResena }}
+        </div>
+      }
+      <div class="row gx-4 gy-5">
+        <div class="col-lg-7">
+          @if (cargandoResenas) {
+            <p class="cargando">
+              <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando
+              reseñas...
+            </p>
+          } @else if (errorResenas !== '') {
+            <div class="alert alert-danger" role="alert">
+              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorResenas }}
+            </div>
+          }
+          @for (r of resenas; track r.id) {
+            <article class="resena">
+              <div class="d-flex justify-content-between align-items-start gap-3">
+                <div>
+                  <span class="estrellas" [title]="r.calificacion + ' de 5'">
+                    @for (n of estrellas; track n) {
+                      <i
+                        aria-hidden="true"
+                        [class]="n <= r.calificacion ? 'fa-solid fa-star' : 'fa-regular fa-star'"
+                      ></i>
+                    }
+                    <span class="visually-hidden">{{ r.calificacion }} de 5</span>
+                  </span>
+                  <h3>{{ r.titulo }}</h3>
+                </div>
+                <div class="d-flex gap-2">
+                  <button
+                    class="boton-secundario boton-pequeno boton-icono"
+                    type="button"
+                    (click)="editar(r)"
+                    title="Editar"
+                    aria-label="Editar reseña"
+                  >
+                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                  </button>
+                  @if (puedeBorrar) {
+                    <button
+                      class="boton-secundario boton-pequeno boton-icono"
+                      type="button"
+                      (click)="pedirBorrado(r)"
+                      title="Borrar"
+                      aria-label="Borrar reseña"
+                    >
+                      <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                    </button>
+                  }
+                </div>
+              </div>
+              <p class="mb-2">{{ r.texto }}</p>
+              <ul class="meta small">
+                <li><i class="fa-solid fa-user" aria-hidden="true"></i>{{ r.socio }}</li>
+                <li>
+                  <i class="fa-solid fa-calendar" aria-hidden="true"></i
+                  >{{ r.fecha | date: 'dd/MM/yyyy' }}
+                </li>
+                @if (r.editada) {
+                  <li><i class="fa-solid fa-pen" aria-hidden="true"></i>Editada</li>
+                }
+                @if (r.votosUtiles > 0) {
+                  <li>
+                    <i class="fa-solid fa-thumbs-up" aria-hidden="true"></i>{{ r.votosUtiles }}
+                  </li>
+                }
+              </ul>
+              @if (confirmandoBorrado === r.id) {
+                <div
+                  class="alert alert-warning d-flex flex-wrap align-items-center gap-2 py-2 mt-3 mb-0"
+                >
+                  <span class="me-auto">
+                    <i class="fa-solid fa-trash me-2" aria-hidden="true"></i>¿Borrar esta reseña?
+                  </span>
+                  <button class="boton-peligro boton-pequeno" type="button" (click)="eliminar(r)">
+                    Sí, borrar
+                  </button>
+                  <button
+                    class="boton-secundario boton-pequeno"
+                    type="button"
+                    (click)="confirmandoBorrado = null"
+                  >
+                    No
+                  </button>
+                </div>
+              }
+            </article>
+          } @empty {
+            @if (!cargandoResenas && errorResenas === '') {
+              <div class="vacio">
+                <i class="fa-regular fa-comment" aria-hidden="true"></i>
+                Aún no tiene reseñas.
+              </div>
+            }
+          }
+        </div>
+
+        <div class="col-lg-5">
+          <form class="formulario-resena" (ngSubmit)="guardarResena()" novalidate>
+            <h3 class="subtitulo-franja">
+              <i
+                class="fa-solid"
+                [class.fa-pen-to-square]="editandoId === null"
+                [class.fa-pen]="editandoId !== null"
+                aria-hidden="true"
+              ></i
+              >{{ editandoId === null ? 'Nueva reseña' : 'Editar reseña' }}
+            </h3>
+            @if (editandoId === null) {
+              <label class="form-label" for="documento-resena">Documento del socio</label>
+              <div class="buscador mb-1">
+                <div class="campo-icono">
+                  <i class="fa-solid fa-id-card icono-campo" aria-hidden="true"></i>
+                  <input
+                    id="documento-resena"
+                    name="documentoSocio"
+                    type="text"
+                    class="form-control"
+                    placeholder="Ej. 1019283746"
+                    [(ngModel)]="documentoSocio"
+                    (ngModelChange)="errorDocumento = ''; socioResena = null"
+                    (keydown.enter)="$event.preventDefault(); buscarSocio()"
+                    [class.is-invalid]="errorDocumento !== ''"
+                  />
+                  <div class="invalid-feedback">{{ errorDocumento }}</div>
+                </div>
+                <button
+                  class="boton-secundario boton-icono"
+                  type="button"
+                  (click)="buscarSocio()"
+                  [disabled]="buscandoSocio"
+                  title="Buscar socio"
+                  aria-label="Buscar socio"
+                >
+                  <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                </button>
+              </div>
+              @if (socioResena) {
+                <p class="small texto-suave mb-3">
+                  <i class="fa-solid fa-user-check me-1" aria-hidden="true"></i>
+                  {{ socioResena.nombres }} {{ socioResena.apellidos }} ({{
+                    socioResena.tipoSocio
+                  }})
+                </p>
+              } @else {
+                <div class="mb-3"></div>
+              }
+            }
+
+            <div class="mb-3">
+              <label class="form-label" for="calificacion">Calificación</label>
+              <div class="campo-icono">
+                <i class="fa-solid fa-star icono-campo" aria-hidden="true"></i>
+                <select
+                  id="calificacion"
+                  name="calificacion"
+                  class="form-select"
+                  [(ngModel)]="calificacion"
+                  (ngModelChange)="errorCalificacion = ''"
+                  [class.is-invalid]="errorCalificacion !== ''"
+                >
+                  <option [ngValue]="null">De 1 a 5</option>
+                  <option [ngValue]="5">5 - Excelente</option>
+                  <option [ngValue]="4">4 - Muy bueno</option>
+                  <option [ngValue]="3">3 - Bueno</option>
+                  <option [ngValue]="2">2 - Regular</option>
+                  <option [ngValue]="1">1 - Malo</option>
+                </select>
+                <div class="invalid-feedback">{{ errorCalificacion }}</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="titulo-resena">Título</label>
+              <input
+                id="titulo-resena"
+                name="tituloResena"
+                type="text"
+                class="form-control"
+                placeholder="Ej. Lo leí para el club de Teusaquillo"
+                [(ngModel)]="tituloResena"
+                (ngModelChange)="errorTitulo = ''"
+                [class.is-invalid]="errorTitulo !== ''"
+              />
+              <div class="invalid-feedback">{{ errorTitulo }}</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="texto-resena">Opinión</label>
+              <textarea
+                id="texto-resena"
+                name="textoResena"
+                rows="4"
+                class="form-control"
+                placeholder="Qué le gustó y a quién se lo recomendaría"
+                [(ngModel)]="textoResena"
+                (ngModelChange)="errorTexto = ''"
+                [class.is-invalid]="errorTexto !== ''"
+              ></textarea>
+              <div class="invalid-feedback">{{ errorTexto }}</div>
+            </div>
+
+            @if (errorGuardar !== '') {
+              <div class="alert alert-danger py-2" role="alert">
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i
+                >{{ errorGuardar }}
+              </div>
+            }
+
+            <div class="d-flex gap-2">
+              <button class="boton-principal flex-fill" type="submit" [disabled]="guardando">
+                <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>{{ textoBotonResena() }}
+              </button>
+              @if (editandoId !== null) {
+                <button class="boton-secundario" type="button" (click)="cancelarEdicion()">
+                  Cancelar
+                </button>
+              }
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+}

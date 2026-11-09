@@ -10,12 +10,25 @@ import { Navbarcomponent } from './components/navbarcomponent/navbarcomponent';
 import { Footercomponent } from './components/footercomponent/footercomponent';
 import { Logincomponent } from './components/logincomponent/logincomponent';
 import { Panelcomponent } from './components/panelcomponent/panelcomponent';
+import { Catalogocomponent } from './components/catalogocomponent/catalogocomponent';
+import { Tarjetalibrocomponent } from './components/tarjetalibrocomponent/tarjetalibrocomponent';
+import { Detallelibrocomponent } from './components/detallelibrocomponent/detallelibrocomponent';
 import { EstadoPipe } from './pipes/estado-pipe';
 
 registerLocaleData(localeEsCo);
 
 @NgModule({
-  declarations: [App, Navbarcomponent, Footercomponent, Logincomponent, Panelcomponent, EstadoPipe],
+  declarations: [
+    App,
+    Navbarcomponent,
+    Footercomponent,
+    Logincomponent,
+    Panelcomponent,
+    Catalogocomponent,
+    Tarjetalibrocomponent,
+    Detallelibrocomponent,
+    EstadoPipe,
+  ],
   imports: [BrowserModule, AppRoutingModule, FormsModule],
   providers: [
     provideBrowserGlobalErrorListeners(),
