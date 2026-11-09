@@ -1,0 +1,245 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <div class="encabezado-fila">
+      <h1>Catálogo</h1>
+      <ul class="cifras">
+        @if (!cargando && error === '') {
+          <li>
+            <i class="fa-solid fa-book" aria-hidden="true"></i>{{ libros.length }}
+            {{ libros.length === 1 ? 'título' : 'títulos' }}
+          </li>
+        }
+        @if (sedes.length > 0) {
+          <li><i class="fa-solid fa-building" aria-hidden="true"></i>{{ sedes.length }} sedes</li>
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="franja tono-negro" aria-label="Búsqueda">
+  <div class="container">
+    <form class="buscador" (ngSubmit)="buscar()" novalidate>
+      <div class="campo-icono campo-grande campo-termino">
+        <label class="visually-hidden" for="termino">Buscar por título, autor, ISBN o tema</label>
+        <i class="fa-solid fa-magnifying-glass icono-campo" aria-hidden="true"></i>
+        <input
+          id="termino"
+          name="termino"
+          type="text"
+          class="form-control"
+          placeholder="Título, autor, ISBN o tema"
+          [(ngModel)]="termino"
+          (ngModelChange)="errorTermino = ''"
+          [class.is-invalid]="errorTermino !== ''"
+        />
+        <div class="invalid-feedback">{{ errorTermino }}</div>
+      </div>
+      <div class="campo-icono campo-grande campo-filtro">
+        <label class="visually-hidden" for="categoria">Categoría</label>
+        <i class="fa-solid fa-filter icono-campo" aria-hidden="true"></i>
+        <select
+          id="categoria"
+          name="categoria"
+          class="form-select"
+          [(ngModel)]="idCategoria"
+          (ngModelChange)="buscar()"
+          [class.is-invalid]="errorCategoria !== ''"
+        >
+          <option [ngValue]="null">Todas las categorías</option>
+          @for (c of categorias; track c.idCategoria) {
+            <option [ngValue]="c.idCategoria">{{ c.nombre }}</option>
+          }
+        </select>
+        <div class="invalid-feedback">{{ errorCategoria }}</div>
+      </div>
+      <div class="campo-icono campo-grande campo-filtro">
+        <label class="visually-hidden" for="sede">Sede</label>
+        <i class="fa-solid fa-location-dot icono-campo" aria-hidden="true"></i>
+        <select
+          id="sede"
+          name="sede"
+          class="form-select"
+          [(ngModel)]="idSede"
+          (ngModelChange)="buscar()"
+          [class.is-invalid]="errorSede !== ''"
+        >
+          <option [ngValue]="null">Todas las sedes</option>
+          @for (s of sedes; track s.idSede) {
+            <option [ngValue]="s.idSede">{{ s.nombre }}</option>
+          }
+        </select>
+        <div class="invalid-feedback">{{ errorSede }}</div>
+      </div>
+      <button
+        class="boton-principal boton-icono grande"
+        type="submit"
+        title="Buscar"
+        aria-label="Buscar"
+      >
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+      </button>
+      <button
+        class="boton-secundario boton-icono grande"
+        type="button"
+        (click)="limpiar()"
+        title="Limpiar filtros"
+        aria-label="Limpiar filtros"
+      >
+        <i class="fa-solid fa-eraser" aria-hidden="true"></i>
+      </button>
+    </form>
+    @if (errorCatalogos !== '') {
+      <div class="alert alert-warning mt-3 mb-0">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>No se cargaron las
+        categorías y sedes: {{ errorCatalogos }}
+      </div>
+    }
+  </div>
+</section>
+
+<section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-disponibilidad">
+  <div class="container">
+    <div class="franja-cabeza">
+      <h2 class="franja-titulo" id="titulo-disponibilidad">Disponibilidad</h2>
+      @if (!cargando && terminoBuscado !== '') {
+        <span class="chip">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>{{ terminoBuscado }}
+        </span>
+      }
+    </div>
+
+    @if (cargando) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Buscando...
+      </p>
+    } @else if (error !== '') {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ error }}
+      </div>
+    } @else if (libros.length === 0) {
+      <div class="vacio">
+        <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+        Sin resultados. La búsqueda quedó registrada para las estadísticas.
+        <div class="mt-3">
+          <button class="boton-secundario boton-pequeno" type="button" (click)="limpiar()">
+            <i class="fa-solid fa-eraser" aria-hidden="true"></i>Limpiar filtros
+          </button>
+        </div>
+      </div>
+    } @else {
+      <div class="table-responsive d-none d-xl-block">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Título</th>
+              <th scope="col">ISBN</th>
+              @for (c of columnasSede; track c.idSede) {
+                <th scope="col" class="text-center">
+                  <i class="fa-solid fa-location-dot me-1" aria-hidden="true"></i>{{ c.sede }}
+                </th>
+              }
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (libro of libros; track libro.idLibro) {
+              <tr>
+                <td>
+                  <div class="principal">{{ libro.titulo }}</div>
+                  <div class="small texto-suave">{{ libro.autores || 'Sin autor registrado' }}</div>
+                </td>
+                <td class="text-nowrap">{{ libro.isbn }}</td>
+                @for (d of libro.porSede; track d.idSede) {
+                  <td class="text-center">
+                    <span
+                      class="cupo"
+                      [attr.data-cupo]="estadoSede(d)"
+                      [title]="d.disponibles + ' de ' + d.total + ' disponibles en ' + d.sede"
+                      >{{ d.total === 0 ? '-' : d.disponibles + '/' + d.total }}</span
+                    >
+                  </td>
+                }
+                <td>
+                  <div class="acciones-fila">
+                    <a
+                      class="boton-principal boton-pequeno boton-icono"
+                      [routerLink]="['/catalogo', libro.idLibro]"
+                      [title]="'Ver ' + libro.titulo"
+                      [attr.aria-label]="'Ver ' + libro.titulo"
+                    >
+                      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="row g-3 d-xl-none">
+        @for (libro of libros; track libro.idLibro) {
+          <div class="col-12 col-md-6">
+            <app-tarjetalibrocomponent [libro]="libro"></app-tarjetalibrocomponent>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+@if (masPrestados.length > 0) {
+  <section class="franja tono-crema" data-bs-theme="light" aria-labelledby="titulo-mas-prestados">
+    <div class="container">
+      <h2 class="franja-titulo mb-4" id="titulo-mas-prestados">
+        <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i>Más prestados
+      </h2>
+      <ol class="ranking">
+        @for (m of masPrestados; track m.etiqueta; let i = $index) {
+          <li>
+            <span class="puesto">{{ i + 1 }}</span>
+            <span>
+              <span class="d-block principal">{{ m.etiqueta }}</span>
+              <span class="texto-suave">
+                <i class="fa-solid fa-right-left me-1" aria-hidden="true"></i>{{ m.valor }}
+                préstamos
+              </span>
+            </span>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+}
+
+@if (sinResultado.length > 0) {
+  <section class="franja tono-cafe" aria-labelledby="titulo-sin-resultado">
+    <div class="container">
+      <h2 class="franja-titulo mb-4" id="titulo-sin-resultado">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>Buscados sin resultado
+      </h2>
+      <div class="terminos">
+        @for (b of sinResultado; track b.etiqueta) {
+          <div class="termino">
+            <span class="termino-texto">{{ b.etiqueta }}</span>
+            <ul class="meta">
+              <li><i class="fa-solid fa-repeat" aria-hidden="true"></i>{{ b.valor }} veces</li>
+              <li><i class="fa-solid fa-building" aria-hidden="true"></i>{{ b.detalle }}</li>
+            </ul>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+}
+
+@if (errorEstadisticas !== '') {
+  <section class="franja tono-crema" data-bs-theme="light">
+    <div class="container">
+      <div class="alert alert-warning mb-0">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>No se cargaron los más
+        prestados ni las búsquedas sin resultado: {{ errorEstadisticas }}
+      </div>
+    </div>
+  </section>
+}

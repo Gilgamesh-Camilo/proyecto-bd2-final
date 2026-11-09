@@ -1,0 +1,31 @@
+@if (libro) {
+  <article class="tarjeta">
+    <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+      <span class="chip">{{ libro.categoria }}</span>
+      @if (libro.anioPublicacion !== null) {
+        <span class="small texto-suave">{{ libro.anioPublicacion }}</span>
+      }
+    </div>
+    <h3 class="titulo">{{ libro.titulo }}</h3>
+    <ul class="meta mb-3">
+      <li>
+        <i class="fa-solid fa-feather" aria-hidden="true"></i
+        >{{ libro.autores || 'Sin autor registrado' }}
+      </li>
+      <li>ISBN {{ libro.isbn }}</li>
+    </ul>
+    <ul class="sedes">
+      @for (d of libro.porSede; track d.idSede) {
+        <li>
+          <span><i class="fa-solid fa-location-dot me-2" aria-hidden="true"></i>{{ d.sede }}</span>
+          <span class="cupo" [attr.data-cupo]="estadoSede(d)">{{
+            d.total === 0 ? '-' : d.disponibles + '/' + d.total
+          }}</span>
+        </li>
+      }
+    </ul>
+    <a class="boton-principal boton-pequeno ver" [routerLink]="['/catalogo', libro.idLibro]">
+      Ver ficha<i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+    </a>
+  </article>
+}
