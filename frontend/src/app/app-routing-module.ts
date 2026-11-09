@@ -5,10 +5,13 @@ import { Detallelibrocomponent } from './components/detallelibrocomponent/detall
 import { Detallesociocomponent } from './components/detallesociocomponent/detallesociocomponent';
 import { Devolucioncomponent } from './components/devolucioncomponent/devolucioncomponent';
 import { Logincomponent } from './components/logincomponent/logincomponent';
+import { Multascomponent } from './components/multascomponent/multascomponent';
+import { Nuevareservacomponent } from './components/nuevareservacomponent/nuevareservacomponent';
 import { Nuevoprestamocomponent } from './components/nuevoprestamocomponent/nuevoprestamocomponent';
 import { Nuevosociocomponent } from './components/nuevosociocomponent/nuevosociocomponent';
 import { Panelcomponent } from './components/panelcomponent/panelcomponent';
 import { Prestamoscomponent } from './components/prestamoscomponent/prestamoscomponent';
+import { Reservascomponent } from './components/reservascomponent/reservascomponent';
 import { Socioscomponent } from './components/socioscomponent/socioscomponent';
 import { SesionGuard } from './guards/sesion-guard';
 
@@ -33,6 +36,9 @@ const routes: Routes = [
     data: { roles: ['ADMINISTRADOR', 'BIBLIOTECARIO'] },
   },
   { path: 'socios/:id', component: Detallesociocomponent, canActivate: [SesionGuard] },
+  { path: 'reservas', component: Reservascomponent, canActivate: [SesionGuard] },
+  { path: 'reservas/nueva', component: Nuevareservacomponent, canActivate: [SesionGuard] },
+  { path: 'multas', component: Multascomponent, canActivate: [SesionGuard] },
   { path: '**', redirectTo: 'panel' },
 ];
 
