@@ -1,0 +1,213 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <div class="encabezado-fila">
+      <h1>Estadísticas</h1>
+      <div class="encabezado-acciones">
+        <button class="boton-secundario" type="button" (click)="cargar()" [disabled]="cargando">
+          @if (cargando) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          } @else {
+            <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+          }
+          Actualizar
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+@if (cargando && !estadisticas) {
+  <section class="franja tono-arena" data-bs-theme="light">
+    <div class="container">
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Calculando...
+      </p>
+    </div>
+  </section>
+} @else if (error !== '') {
+  <section class="franja tono-arena" data-bs-theme="light">
+    <div class="container">
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ error }}
+      </div>
+    </div>
+  </section>
+}
+
+@if (estadisticas) {
+  <section class="franja tono-arena" data-bs-theme="light" aria-label="Préstamos">
+    <div class="container">
+      <div class="row gx-4 gy-5">
+        <div class="col-lg-6">
+          <div class="cabeza-bloque">
+            <h2 class="subtitulo-franja mb-0">
+              <i class="fa-solid fa-building" aria-hidden="true"></i>Préstamos por sede
+            </h2>
+            <span class="chip" title="GROUP BY con FILTER"
+              ><i class="fa-solid fa-database" aria-hidden="true"></i>PostgreSQL</span
+            >
+          </div>
+          @for (fila of estadisticas.prestamosPorSede; track fila.etiqueta) {
+            <div class="fila">
+              <div class="d-flex justify-content-between gap-3">
+                <span>{{ fila.etiqueta }}</span>
+                <strong>{{ fila.valor }}</strong>
+              </div>
+              <div class="barra-dato">
+                <span [style.width.%]="ancho(estadisticas.prestamosPorSede, fila.valor)"></span>
+              </div>
+              @if (fila.detalle !== '') {
+                <div class="small texto-suave">{{ fila.detalle }}</div>
+              }
+            </div>
+          } @empty {
+            <p class="texto-suave mb-0">Sin préstamos registrados.</p>
+          }
+        </div>
+        <div class="col-lg-6">
+          <div class="cabeza-bloque">
+            <h2 class="subtitulo-franja mb-0">
+              <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i>Más prestados
+            </h2>
+            <span class="chip" title="GROUP BY y ORDER BY"
+              ><i class="fa-solid fa-database" aria-hidden="true"></i>PostgreSQL</span
+            >
+          </div>
+          @for (fila of estadisticas.librosMasPrestados; track fila.etiqueta) {
+            <div class="fila">
+              <div class="d-flex justify-content-between gap-3">
+                <span>{{ fila.etiqueta }}</span>
+                <strong>{{ fila.valor }}</strong>
+              </div>
+              <div class="barra-dato">
+                <span [style.width.%]="ancho(estadisticas.librosMasPrestados, fila.valor)"></span>
+              </div>
+            </div>
+          } @empty {
+            <p class="texto-suave mb-0">Sin préstamos registrados.</p>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-crema" data-bs-theme="light" aria-label="Reseñas">
+    <div class="container">
+      <div class="row gx-4 gy-5">
+        <div class="col-lg-6">
+          <div class="cabeza-bloque">
+            <h2 class="subtitulo-franja mb-0">
+              <i class="fa-solid fa-star" aria-hidden="true"></i>Mejor calificados
+            </h2>
+            <span class="chip" title="$group, $match y $lookup"
+              ><i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB</span
+            >
+          </div>
+          @for (fila of estadisticas.mejorCalificados; track fila.etiqueta) {
+            <div class="fila">
+              <div class="d-flex justify-content-between gap-3">
+                <span>{{ fila.etiqueta }}</span>
+                <strong>{{ fila.valor | number: '1.1-1' }}</strong>
+              </div>
+              <div class="barra-dato">
+                <span [style.width.%]="ancho(estadisticas.mejorCalificados, fila.valor)"></span>
+              </div>
+              @if (fila.detalle !== '') {
+                <div class="small texto-suave">{{ fila.detalle }}</div>
+              }
+            </div>
+          } @empty {
+            <p class="texto-suave mb-0">Aún no hay libros con dos reseñas o más.</p>
+          }
+        </div>
+        <div class="col-lg-6">
+          <div class="cabeza-bloque">
+            <h2 class="subtitulo-franja mb-0">
+              <i class="fa-solid fa-tags" aria-hidden="true"></i>Reseñas por categoría
+            </h2>
+            <span class="chip" title="$lookup y $group"
+              ><i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB</span
+            >
+          </div>
+          @for (fila of estadisticas.resenasPorCategoria; track fila.etiqueta) {
+            <div class="fila">
+              <div class="d-flex justify-content-between gap-3">
+                <span>{{ fila.etiqueta }}</span>
+                <strong>{{ fila.valor }}</strong>
+              </div>
+              <div class="barra-dato">
+                <span [style.width.%]="ancho(estadisticas.resenasPorCategoria, fila.valor)"></span>
+              </div>
+              @if (fila.detalle !== '') {
+                <div class="small texto-suave">{{ fila.detalle }}</div>
+              }
+            </div>
+          } @empty {
+            <p class="texto-suave mb-0">Aún no hay reseñas.</p>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-cafe" aria-label="Búsquedas">
+    <div class="container">
+      <div class="row gx-4 gy-5">
+        <div class="col-lg-6">
+          <div class="cabeza-bloque">
+            <h2 class="subtitulo-franja mb-0">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>Más buscados
+            </h2>
+            <span class="chip" title="$group y $cond, últimos 60 días"
+              ><i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB</span
+            >
+          </div>
+          @for (fila of estadisticas.terminosMasBuscados; track fila.etiqueta) {
+            <div class="fila">
+              <div class="d-flex justify-content-between gap-3">
+                <span>{{ fila.etiqueta }}</span>
+                <strong>{{ fila.valor }}</strong>
+              </div>
+              <div class="barra-dato">
+                <span [style.width.%]="ancho(estadisticas.terminosMasBuscados, fila.valor)"></span>
+              </div>
+              @if (fila.detalle !== '') {
+                <div class="small texto-suave">{{ fila.detalle }}</div>
+              }
+            </div>
+          } @empty {
+            <p class="texto-suave mb-0">No hay búsquedas recientes.</p>
+          }
+        </div>
+        <div class="col-lg-6">
+          <div class="cabeza-bloque">
+            <h2 class="subtitulo-franja mb-0">
+              <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>Sin resultado
+            </h2>
+            <span class="chip" title="$match, $group y $addToSet"
+              ><i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB</span
+            >
+          </div>
+          @for (fila of estadisticas.busquedasSinResultado; track fila.etiqueta) {
+            <div class="fila">
+              <div class="d-flex justify-content-between gap-3">
+                <span>{{ fila.etiqueta }}</span>
+                <strong>{{ fila.valor }}</strong>
+              </div>
+              <div class="barra-dato">
+                <span
+                  [style.width.%]="ancho(estadisticas.busquedasSinResultado, fila.valor)"
+                ></span>
+              </div>
+              @if (fila.detalle !== '') {
+                <div class="small texto-suave">{{ fila.detalle }}</div>
+              }
+            </div>
+          } @empty {
+            <p class="texto-suave mb-0">Todas las búsquedas recientes encontraron libros.</p>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+}

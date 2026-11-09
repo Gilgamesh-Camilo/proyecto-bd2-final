@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { Auditoriacomponent } from './components/auditoriacomponent/auditoriacomponent';
 import { Catalogocomponent } from './components/catalogocomponent/catalogocomponent';
 import { Detallelibrocomponent } from './components/detallelibrocomponent/detallelibrocomponent';
 import { Detallesociocomponent } from './components/detallesociocomponent/detallesociocomponent';
 import { Devolucioncomponent } from './components/devolucioncomponent/devolucioncomponent';
+import { Estadisticascomponent } from './components/estadisticascomponent/estadisticascomponent';
 import { Logincomponent } from './components/logincomponent/logincomponent';
 import { Multascomponent } from './components/multascomponent/multascomponent';
 import { Nuevareservacomponent } from './components/nuevareservacomponent/nuevareservacomponent';
@@ -51,6 +53,13 @@ const routes: Routes = [
     component: Nuevotrasladocomponent,
     canActivate: [SesionGuard],
     data: { roles: ['ADMINISTRADOR', 'BIBLIOTECARIO'] },
+  },
+  { path: 'estadisticas', component: Estadisticascomponent, canActivate: [SesionGuard] },
+  {
+    path: 'auditoria',
+    component: Auditoriacomponent,
+    canActivate: [SesionGuard],
+    data: { roles: ['ADMINISTRADOR'] },
   },
   { path: '**', redirectTo: 'panel' },
 ];
