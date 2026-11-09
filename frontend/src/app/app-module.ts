@@ -19,6 +19,8 @@ import { Devolucioncomponent } from './components/devolucioncomponent/devolucion
 import { Socioscomponent } from './components/socioscomponent/socioscomponent';
 import { Nuevosociocomponent } from './components/nuevosociocomponent/nuevosociocomponent';
 import { Detallesociocomponent } from './components/detallesociocomponent/detallesociocomponent';
+import { Reservascomponent } from './components/reservascomponent/reservascomponent';
+import { Nuevareservacomponent } from './components/nuevareservacomponent/nuevareservacomponent';
 import { EstadoPipe } from './pipes/estado-pipe';
 
 registerLocaleData(localeEsCo);
@@ -39,6 +41,8 @@ registerLocaleData(localeEsCo);
     Socioscomponent,
     Nuevosociocomponent,
     Detallesociocomponent,
+    Reservascomponent,
+    Nuevareservacomponent,
     EstadoPipe,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule],
