@@ -1,0 +1,172 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <div class="encabezado-fila">
+      <h1>Multas</h1>
+      @if (!cargando && error === '') {
+        <ul class="cifras">
+          <li>
+            <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>{{ multas.length }}
+            {{ multas.length === 1 ? 'multa' : 'multas' }}
+          </li>
+          <li>
+            <i class="fa-solid fa-coins" aria-hidden="true"></i>$ {{ total() | number: '1.0-0' }}
+          </li>
+        </ul>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-multas">
+  <div class="container">
+    <div class="franja-cabeza">
+      <h2 class="franja-titulo" id="titulo-multas">Cobros</h2>
+      <div class="pestanas" role="group" aria-label="Estado">
+        <button
+          class="pestana"
+          type="button"
+          [class.activa]="estado === ''"
+          [attr.aria-pressed]="estado === ''"
+          (click)="estado = ''; cargar()"
+        >
+          Todas
+        </button>
+        @for (e of estados; track e) {
+          <button
+            class="pestana"
+            type="button"
+            [class.activa]="estado === e"
+            [attr.aria-pressed]="estado === e"
+            (click)="estado = e; cargar()"
+          >
+            {{ e | estado }}
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (errorEstado !== '') {
+      <div class="alert alert-danger" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorEstado }}
+      </div>
+    }
+    @if (mensaje !== '') {
+      <div class="alert alert-success alert-dismissible" role="status">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensaje }}
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="mensaje = ''"></button>
+      </div>
+    }
+    @if (errorAccion !== '') {
+      <div class="alert alert-danger alert-dismissible" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorAccion }}
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="errorAccion = ''"
+        ></button>
+      </div>
+    }
+
+    @if (cargando) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando
+        multas...
+      </p>
+    } @else if (error !== '') {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ error }}
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Socio</th>
+              <th scope="col">Libro</th>
+              <th scope="col">Motivo</th>
+              <th scope="col">Valor</th>
+              <th scope="col">Generada</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of multas; track m.idPrestamo) {
+              <tr>
+                <td>
+                  <a class="principal" [routerLink]="['/socios', m.idSocio]">{{ m.socio }}</a>
+                  <div class="small texto-suave">{{ m.numeroDocumento }}</div>
+                </td>
+                <td>
+                  {{ m.titulo }}
+                  <div class="small texto-suave">Préstamo {{ m.idPrestamo }}</div>
+                </td>
+                <td>{{ m.motivo | estado }}</td>
+                <td class="text-nowrap principal">$ {{ m.valor | number: '1.0-0' }}</td>
+                <td>
+                  {{ m.fechaGeneracion | date: 'dd/MM/yyyy' }}
+                  @if (m.fechaPago) {
+                    <div class="small texto-suave">
+                      <i class="fa-solid fa-circle-check me-1" aria-hidden="true"></i
+                      >{{ m.fechaPago | date: 'dd/MM/yyyy' }}
+                    </div>
+                  }
+                </td>
+                <td>
+                  <span class="estado" [attr.data-estado]="m.estado">{{ m.estado | estado }}</span>
+                </td>
+                <td>
+                  @if (m.estado === 'PENDIENTE' && puedeCobrar) {
+                    <div class="acciones-fila">
+                      @if (confirmando === m.idPrestamo) {
+                        <button
+                          class="boton-principal boton-pequeno"
+                          type="button"
+                          (click)="pagar(m)"
+                        >
+                          Confirmar pago
+                        </button>
+                        <button
+                          class="boton-secundario boton-pequeno"
+                          type="button"
+                          (click)="confirmando = null"
+                        >
+                          No
+                        </button>
+                      } @else {
+                        <button
+                          class="boton-principal boton-pequeno"
+                          type="button"
+                          (click)="confirmando = m.idPrestamo"
+                          [disabled]="pagando !== null"
+                        >
+                          @if (pagando === m.idPrestamo) {
+                            <span
+                              class="spinner-border spinner-border-sm"
+                              aria-hidden="true"
+                            ></span>
+                            Registrando...
+                          } @else {
+                            <i class="fa-solid fa-coins" aria-hidden="true"></i>Cobrar
+                          }
+                        </button>
+                      }
+                    </div>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="vacio">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>Sin multas con ese
+                  estado.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>
