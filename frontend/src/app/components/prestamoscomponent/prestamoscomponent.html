@@ -281,6 +281,17 @@
                         <i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i>
                       </a>
                     </div>
+                  } @else if (p.estado === 'DEVUELTO' && puedeMultar) {
+                    <div class="acciones-fila">
+                      <a
+                        class="boton-secundario boton-pequeno boton-icono"
+                        [routerLink]="['/prestamos', p.idPrestamo, 'devolucion']"
+                        [title]="'Registrar daño de ' + p.codigoBarras"
+                        [attr.aria-label]="'Registrar daño de ' + p.codigoBarras"
+                      >
+                        <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>
+                      </a>
+                    </div>
                   }
                 </td>
               </tr>

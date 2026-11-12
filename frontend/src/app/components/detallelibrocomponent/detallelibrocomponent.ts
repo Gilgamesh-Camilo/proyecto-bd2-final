@@ -1,10 +1,14 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { EjemplarModel } from '../../models/ejemplar.model';
 import { EmpleadoModel } from '../../models/empleado.model';
 import { LibroDetalleModel } from '../../models/libro-detalle.model';
 import { ResenaModel } from '../../models/resena.model';
+import { SedeModel } from '../../models/sede.model';
 import { SocioModel } from '../../models/socio.model';
 import { AuthService } from '../../services/auth.service';
+import { CatalogoService } from '../../services/catalogo.service';
+import { DatosService } from '../../services/datos.service';
 import { LibroService } from '../../services/libro.service';
 import { ResenaService } from '../../services/resena.service';
 import { SocioService } from '../../services/socio.service';
@@ -22,6 +26,27 @@ export class Detallelibrocomponent implements OnInit {
   cargando: boolean = true;
   error: string = '';
   estrellas: number[] = [1, 2, 3, 4, 5];
+
+  puedeAgregarEjemplares: boolean = false;
+  mostrandoEjemplares: boolean = false;
+  sedes: SedeModel[] = [];
+  idSede: number | null = null;
+  cantidad: number | null = 1;
+  ubicacionEstante: string = '';
+  valorReposicion: number | null = null;
+  errorSede: string = '';
+  errorCantidad: string = '';
+  errorUbicacion: string = '';
+  errorValor: string = '';
+  errorEjemplares: string = '';
+  mensajeEjemplares: string = '';
+  guardandoEjemplares: boolean = false;
+
+  ejemplarEstado: EjemplarModel | null = null;
+  nuevoEstado: string = '';
+  errorNuevoEstado: string = '';
+  errorCambioEstado: string = '';
+  guardandoEstado: boolean = false;
 
   resenas: ResenaModel[] = [];
   cargandoResenas: boolean = true;
@@ -47,6 +72,8 @@ export class Detallelibrocomponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private auth: AuthService,
+    private catalogoService: CatalogoService,
+    private datos: DatosService,
     private libroService: LibroService,
     private resenaService: ResenaService,
     private socioService: SocioService,
@@ -56,6 +83,8 @@ export class Detallelibrocomponent implements OnInit {
   ngOnInit(): void {
     this.empleado = this.auth.getEmpleado();
     this.puedeBorrar = this.auth.tieneRol(['ADMINISTRADOR', 'BIBLIOTECARIO']);
+    this.puedeAgregarEjemplares = this.auth.tieneRol(['ADMINISTRADOR', 'BIBLIOTECARIO']);
+    this.mensajeEjemplares = this.datos.mensajeNavegacion();
     const parametro: unknown = this.route.snapshot.paramMap.get('id');
     const errorId = this.validarId(parametro);
     if (errorId !== '') {
@@ -67,6 +96,9 @@ export class Detallelibrocomponent implements OnInit {
     this.idLibro = Number(parametro);
     this.cargar();
     this.cargarResenas();
+    if (this.puedeAgregarEjemplares) {
+      this.cargarSedes();
+    }
   }
 
   validarId(valor: unknown): string {
@@ -120,6 +152,206 @@ export class Detallelibrocomponent implements OnInit {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  cargarSedes(): void {
+    this.catalogoService.getCatalogos().subscribe({
+      next: (catalogos) => {
+        this.sedes = [];
+        for (const sede of catalogos.sedes) {
+          if (sede.estado === 'ACTIVA') {
+            this.sedes.push(sede);
+          }
+        }
+        this.idSede = this.sedePorDefecto();
+        this.cdr.markForCheck();
+      },
+      error: (e: unknown) => {
+        this.errorEjemplares = this.auth.mensajeError(e);
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  abrirEjemplares(): void {
+    this.cerrarEstado();
+    this.mostrandoEjemplares = true;
+    this.mensajeEjemplares = '';
+  }
+
+  cerrarEjemplares(): void {
+    this.mostrandoEjemplares = false;
+    this.limpiarEjemplares();
+  }
+
+  validarSede(valor: unknown): string {
+    if (typeof valor !== 'number' || !Number.isInteger(valor) || valor <= 0) {
+      return 'Elige la sede.';
+    }
+    for (const sede of this.sedes) {
+      if (sede.idSede === valor) {
+        return '';
+      }
+    }
+    return 'Elige la sede.';
+  }
+
+  validarCantidad(valor: unknown): string {
+    if (typeof valor !== 'number' || !Number.isInteger(valor)) {
+      return 'La cantidad debe ser un número entero.';
+    }
+    if (valor < 1 || valor > 20) {
+      return 'La cantidad va de 1 a 20 ejemplares.';
+    }
+    return '';
+  }
+
+  validarUbicacion(valor: unknown): string {
+    if (typeof valor !== 'string') {
+      return 'La ubicación debe ser texto.';
+    }
+    if (valor.trim().length > 30) {
+      return 'La ubicación tiene máximo 30 caracteres.';
+    }
+    return '';
+  }
+
+  validarValor(valor: unknown): string {
+    if (valor === null) {
+      return '';
+    }
+    if (typeof valor !== 'number' || !Number.isFinite(valor)) {
+      return 'El valor debe ser un número.';
+    }
+    if (valor < 0 || valor > 9999999999) {
+      return 'El valor debe estar entre 0 y 9999999999.';
+    }
+    if (!/^[0-9]+(\.[0-9]{1,2})?$/.test(String(valor))) {
+      return 'El valor admite máximo dos decimales.';
+    }
+    return '';
+  }
+
+  puedeCambiarEstado(ejemplar: EjemplarModel): boolean {
+    return this.puedeAgregarEjemplares && this.estadosPara(ejemplar.estado).length > 0;
+  }
+
+  estadosPara(estado: string): string[] {
+    if (estado === 'DISPONIBLE') {
+      return ['EN_REPARACION', 'PERDIDO', 'DE_BAJA'];
+    }
+    if (estado === 'EN_REPARACION') {
+      return ['DISPONIBLE', 'PERDIDO', 'DE_BAJA'];
+    }
+    if (estado === 'PERDIDO') {
+      return ['DISPONIBLE', 'EN_REPARACION', 'DE_BAJA'];
+    }
+    return [];
+  }
+
+  abrirEstado(ejemplar: EjemplarModel): void {
+    this.ejemplarEstado = ejemplar;
+    this.nuevoEstado = '';
+    this.errorNuevoEstado = '';
+    this.errorCambioEstado = '';
+    this.mensajeEjemplares = '';
+    this.mostrandoEjemplares = false;
+  }
+
+  cerrarEstado(): void {
+    this.ejemplarEstado = null;
+    this.nuevoEstado = '';
+    this.errorNuevoEstado = '';
+    this.errorCambioEstado = '';
+  }
+
+  validarNuevoEstado(valor: unknown): string {
+    if (typeof valor !== 'string' || valor === '') {
+      return 'Elige el nuevo estado.';
+    }
+    if (this.ejemplarEstado === null) {
+      return 'Elige primero el ejemplar.';
+    }
+    if (this.estadosPara(this.ejemplarEstado.estado).indexOf(valor) === -1) {
+      return 'Ese cambio de estado no está permitido.';
+    }
+    return '';
+  }
+
+  cambiarEstado(): void {
+    this.errorCambioEstado = '';
+    if (!this.puedeAgregarEjemplares) {
+      this.errorCambioEstado = 'Tu rol no puede cambiar el estado de los ejemplares.';
+      return;
+    }
+    this.errorNuevoEstado = this.validarNuevoEstado(this.nuevoEstado);
+    if (this.errorNuevoEstado !== '' || this.ejemplarEstado === null) {
+      return;
+    }
+    const codigo = this.ejemplarEstado.codigoBarras;
+    this.guardandoEstado = true;
+    this.libroService
+      .cambiarEstadoEjemplar(this.ejemplarEstado.idEjemplar, this.nuevoEstado)
+      .subscribe({
+        next: (resultado) => {
+          this.guardandoEstado = false;
+          this.cerrarEstado();
+          this.mensajeEjemplares = codigo + ': ' + resultado.mensaje;
+          this.cargar();
+        },
+        error: (e: unknown) => {
+          this.guardandoEstado = false;
+          this.errorCambioEstado = this.auth.mensajeError(e);
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  agregarEjemplares(): void {
+    this.errorEjemplares = '';
+    this.mensajeEjemplares = '';
+    if (!this.puedeAgregarEjemplares) {
+      this.errorEjemplares = 'Tu rol no puede agregar ejemplares.';
+      return;
+    }
+    this.errorSede = this.validarSede(this.idSede);
+    this.errorCantidad = this.validarCantidad(this.cantidad);
+    this.errorUbicacion = this.validarUbicacion(this.ubicacionEstante);
+    this.errorValor = this.validarValor(this.valorReposicion);
+    if (
+      this.errorSede !== '' ||
+      this.errorCantidad !== '' ||
+      this.errorUbicacion !== '' ||
+      this.errorValor !== '' ||
+      this.idLibro === null ||
+      this.idSede === null ||
+      this.cantidad === null
+    ) {
+      return;
+    }
+    const ubicacion = this.ubicacionEstante.trim();
+    this.guardandoEjemplares = true;
+    this.libroService
+      .registrarEjemplares(this.idLibro, {
+        idSede: this.idSede,
+        cantidad: this.cantidad,
+        ubicacionEstante: ubicacion === '' ? null : ubicacion,
+        valorReposicion: this.valorReposicion,
+      })
+      .subscribe({
+        next: (resultado) => {
+          this.guardandoEjemplares = false;
+          this.mostrandoEjemplares = false;
+          this.limpiarEjemplares();
+          this.mensajeEjemplares = resultado.mensaje;
+          this.cargar();
+        },
+        error: (e: unknown) => {
+          this.guardandoEjemplares = false;
+          this.errorEjemplares = this.auth.mensajeError(e);
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   disponiblesEnMiSede(): number {
@@ -322,6 +554,30 @@ export class Detallelibrocomponent implements OnInit {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  private sedePorDefecto(): number | null {
+    if (this.empleado === null) {
+      return null;
+    }
+    for (const sede of this.sedes) {
+      if (sede.idSede === this.empleado.idSede) {
+        return sede.idSede;
+      }
+    }
+    return null;
+  }
+
+  private limpiarEjemplares(): void {
+    this.idSede = this.sedePorDefecto();
+    this.cantidad = 1;
+    this.ubicacionEstante = '';
+    this.valorReposicion = null;
+    this.errorSede = '';
+    this.errorCantidad = '';
+    this.errorUbicacion = '';
+    this.errorValor = '';
+    this.errorEjemplares = '';
   }
 
   private terminarGuardado(mensaje: string): void {

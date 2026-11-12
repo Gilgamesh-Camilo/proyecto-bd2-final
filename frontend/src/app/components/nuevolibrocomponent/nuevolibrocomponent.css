@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.autor-fila {
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem 1.25rem;
+  background: var(--campo);
+  border: 1px solid var(--linea);
+  border-radius: 18px;
+}
+
+.autor-cabeza {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-weight: 650;
+}

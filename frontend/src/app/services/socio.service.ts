@@ -73,6 +73,22 @@ export class SocioService {
       .pipe(map((respuesta) => this.datos.resultado(respuesta, 'p_id_socio')));
   }
 
+  public cambiarEstado(idSocio: number, estado: string): Observable<ResultadoModel> {
+    return this.http
+      .post<unknown>(
+        this.url + idSocio + '/estado/',
+        { estado: estado },
+        { headers: this.auth.getHeaders() },
+      )
+      .pipe(map((respuesta) => this.datos.resultado(respuesta, '')));
+  }
+
+  public renovarCarne(idSocio: number): Observable<ResultadoModel> {
+    return this.http
+      .post<unknown>(this.url + idSocio + '/carne/', {}, { headers: this.auth.getHeaders() })
+      .pipe(map((respuesta) => this.datos.resultado(respuesta, '')));
+  }
+
   private aSocios(valor: unknown): SocioModel[] {
     if (!Array.isArray(valor)) {
       throw this.datos.error();

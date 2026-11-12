@@ -1,0 +1,341 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <div class="encabezado-fila">
+      <h1>Administración</h1>
+      <ul class="cifras">
+        @if (!cargandoSedes && errorSedes === '') {
+          <li><i class="fa-solid fa-building" aria-hidden="true"></i>{{ sedes.length }} sedes</li>
+        }
+        @if (!cargandoEmpleados && errorEmpleados === '') {
+          <li [class.alerta]="bloqueados() > 0">
+            <i class="fa-solid fa-user-lock" aria-hidden="true"></i>{{ bloqueados() }}
+            {{ bloqueados() === 1 ? 'cuenta bloqueada' : 'cuentas bloqueadas' }}
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-sedes">
+  <div class="container">
+    <div class="franja-cabeza">
+      <h2 class="franja-titulo" id="titulo-sedes">Sedes</h2>
+      @if (!mostrandoFormulario) {
+        <button type="button" class="boton-secundario boton-pequeno" (click)="abrirFormulario()">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>Nueva sede
+        </button>
+      }
+    </div>
+
+    @if (mensajeSedes !== '') {
+      <div class="alert alert-success alert-dismissible" role="status">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensajeSedes }}
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="mensajeSedes = ''"
+        ></button>
+      </div>
+    }
+    @if (errorAccionSedes !== '') {
+      <div class="alert alert-danger alert-dismissible" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorAccionSedes }}
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="errorAccionSedes = ''"
+        ></button>
+      </div>
+    }
+
+    @if (mostrandoFormulario) {
+      <form class="formulario-sede" (ngSubmit)="registrarSede()" novalidate>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label" for="nombre-sede">Nombre</label>
+            <input
+              id="nombre-sede"
+              name="nombre"
+              type="text"
+              class="form-control"
+              placeholder="Ej. Sede Fontibón"
+              [(ngModel)]="nombre"
+              (ngModelChange)="errorNombre = ''"
+              [class.is-invalid]="errorNombre !== ''"
+            />
+            <div class="invalid-feedback">{{ errorNombre }}</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" for="direccion-sede">Dirección</label>
+            <input
+              id="direccion-sede"
+              name="direccion"
+              type="text"
+              class="form-control"
+              placeholder="Ej. Cl 17 # 99-20"
+              [(ngModel)]="direccion"
+              (ngModelChange)="errorDireccion = ''"
+              [class.is-invalid]="errorDireccion !== ''"
+            />
+            <div class="invalid-feedback">{{ errorDireccion }}</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="ciudad-sede">Ciudad</label>
+            <input
+              id="ciudad-sede"
+              name="ciudad"
+              type="text"
+              class="form-control"
+              placeholder="Ej. Bogotá"
+              [(ngModel)]="ciudad"
+              (ngModelChange)="errorCiudad = ''"
+              [class.is-invalid]="errorCiudad !== ''"
+            />
+            <div class="invalid-feedback">{{ errorCiudad }}</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="telefono-sede"
+              >Teléfono <span class="texto-suave">(opcional)</span></label
+            >
+            <input
+              id="telefono-sede"
+              name="telefono"
+              type="tel"
+              class="form-control"
+              placeholder="Ej. 6014125590"
+              [(ngModel)]="telefono"
+              (ngModelChange)="errorTelefono = ''"
+              [class.is-invalid]="errorTelefono !== ''"
+            />
+            <div class="invalid-feedback">{{ errorTelefono }}</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="apertura-sede"
+              >Fecha de apertura <span class="texto-suave">(opcional)</span></label
+            >
+            <input
+              id="apertura-sede"
+              name="fechaApertura"
+              type="date"
+              class="form-control"
+              [(ngModel)]="fechaApertura"
+              (ngModelChange)="errorFechaApertura = ''"
+              [class.is-invalid]="errorFechaApertura !== ''"
+            />
+            <div class="invalid-feedback">{{ errorFechaApertura }}</div>
+          </div>
+        </div>
+        @if (errorGuardar !== '') {
+          <div class="alert alert-danger py-2 mt-3 mb-0" role="alert">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorGuardar }}
+          </div>
+        }
+        <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">
+          <button type="button" class="boton-secundario boton-pequeno" (click)="cerrarFormulario()">
+            Cancelar
+          </button>
+          <button type="submit" class="boton-principal boton-pequeno" [disabled]="guardando">
+            @if (guardando) {
+              <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              Guardando...
+            } @else {
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>Registrar sede
+            }
+          </button>
+        </div>
+      </form>
+    }
+
+    @if (cargandoSedes) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando
+        sedes...
+      </p>
+    } @else if (errorSedes !== '') {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorSedes }}
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Sede</th>
+              <th scope="col">Teléfono</th>
+              <th scope="col">Apertura</th>
+              <th scope="col">Ejemplares</th>
+              <th scope="col">Empleados</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of sedes; track s.idSede) {
+              <tr>
+                <td>
+                  <div class="principal">{{ s.nombre }}</div>
+                  <div class="small texto-suave">{{ s.direccion }}, {{ s.ciudad }}</div>
+                </td>
+                <td>{{ s.telefono ?? '-' }}</td>
+                <td>{{ s.fechaApertura ? (s.fechaApertura | date: 'dd/MM/yyyy') : '-' }}</td>
+                <td>{{ s.ejemplares }}</td>
+                <td>{{ s.empleados }}</td>
+                <td>
+                  <span class="estado" [attr.data-estado]="s.estado">{{ s.estado | estado }}</span>
+                </td>
+                <td>
+                  <div class="acciones-fila">
+                    @if (confirmandoSede === s.idSede) {
+                      <button
+                        class="boton-peligro boton-pequeno"
+                        type="button"
+                        (click)="cambiarEstadoSede(s)"
+                      >
+                        Confirmar cierre
+                      </button>
+                      <button
+                        class="boton-secundario boton-pequeno"
+                        type="button"
+                        (click)="confirmandoSede = null"
+                      >
+                        No
+                      </button>
+                    } @else if (s.estado === 'ACTIVA') {
+                      <button
+                        class="boton-secundario boton-pequeno"
+                        type="button"
+                        [disabled]="cambiandoSede !== null"
+                        (click)="confirmandoSede = s.idSede"
+                      >
+                        <i class="fa-solid fa-door-closed" aria-hidden="true"></i>Cerrar
+                      </button>
+                    } @else {
+                      <button
+                        class="boton-secundario boton-pequeno"
+                        type="button"
+                        [disabled]="cambiandoSede !== null"
+                        (click)="cambiarEstadoSede(s)"
+                      >
+                        <i class="fa-solid fa-door-open" aria-hidden="true"></i>Reabrir
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="vacio">
+                  <i class="fa-solid fa-building" aria-hidden="true"></i>Sin sedes registradas.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>
+
+<section class="franja tono-crema" data-bs-theme="light" aria-labelledby="titulo-empleados">
+  <div class="container">
+    <div class="franja-cabeza">
+      <h2 class="franja-titulo" id="titulo-empleados">Cuentas de empleados</h2>
+    </div>
+
+    @if (mensajeEmpleados !== '') {
+      <div class="alert alert-success alert-dismissible" role="status">
+        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensajeEmpleados }}
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="mensajeEmpleados = ''"
+        ></button>
+      </div>
+    }
+    @if (errorAccionEmpleados !== '') {
+      <div class="alert alert-danger alert-dismissible" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i
+        >{{ errorAccionEmpleados }}
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Cerrar"
+          (click)="errorAccionEmpleados = ''"
+        ></button>
+      </div>
+    }
+
+    @if (cargandoEmpleados) {
+      <p class="cargando">
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando
+        empleados...
+      </p>
+    } @else if (errorEmpleados !== '') {
+      <div class="alert alert-danger mb-0" role="alert">
+        <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorEmpleados }}
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Empleado</th>
+              <th scope="col">Rol</th>
+              <th scope="col">Sede</th>
+              <th scope="col">Último ingreso</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of empleados; track e.idEmpleado) {
+              <tr>
+                <td>
+                  <div class="principal">{{ e.nombres }} {{ e.apellidos }}</div>
+                  <div class="small texto-suave">{{ e.usuario }}</div>
+                </td>
+                <td>{{ e.rol | estado }}</td>
+                <td>{{ e.sede }}</td>
+                <td>
+                  {{ e.ultimoAcceso ? (e.ultimoAcceso | date: 'dd/MM/yyyy HH:mm') : 'Nunca' }}
+                </td>
+                <td>
+                  <span class="estado" [attr.data-estado]="e.estado">{{ e.estado | estado }}</span>
+                </td>
+                <td>
+                  @if (e.estado === 'BLOQUEADO') {
+                    <div class="acciones-fila">
+                      <button
+                        class="boton-principal boton-pequeno"
+                        type="button"
+                        [disabled]="desbloqueando !== null"
+                        (click)="desbloquear(e)"
+                      >
+                        @if (desbloqueando === e.idEmpleado) {
+                          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                          Desbloqueando...
+                        } @else {
+                          <i class="fa-solid fa-unlock" aria-hidden="true"></i>Desbloquear
+                        }
+                      </button>
+                    </div>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="vacio">
+                  <i class="fa-solid fa-users" aria-hidden="true"></i>Sin empleados registrados.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</section>

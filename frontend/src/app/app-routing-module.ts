@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { Administracioncomponent } from './components/administracioncomponent/administracioncomponent';
 import { Auditoriacomponent } from './components/auditoriacomponent/auditoriacomponent';
 import { Catalogocomponent } from './components/catalogocomponent/catalogocomponent';
 import { Detallelibrocomponent } from './components/detallelibrocomponent/detallelibrocomponent';
@@ -9,6 +10,7 @@ import { Estadisticascomponent } from './components/estadisticascomponent/estadi
 import { Logincomponent } from './components/logincomponent/logincomponent';
 import { Multascomponent } from './components/multascomponent/multascomponent';
 import { Nuevareservacomponent } from './components/nuevareservacomponent/nuevareservacomponent';
+import { Nuevolibrocomponent } from './components/nuevolibrocomponent/nuevolibrocomponent';
 import { Nuevoprestamocomponent } from './components/nuevoprestamocomponent/nuevoprestamocomponent';
 import { Nuevosociocomponent } from './components/nuevosociocomponent/nuevosociocomponent';
 import { Nuevotrasladocomponent } from './components/nuevotrasladocomponent/nuevotrasladocomponent';
@@ -24,6 +26,12 @@ const routes: Routes = [
   { path: 'login', component: Logincomponent },
   { path: 'panel', component: Panelcomponent, canActivate: [SesionGuard] },
   { path: 'catalogo', component: Catalogocomponent, canActivate: [SesionGuard] },
+  {
+    path: 'catalogo/nuevo',
+    component: Nuevolibrocomponent,
+    canActivate: [SesionGuard],
+    data: { roles: ['ADMINISTRADOR', 'BIBLIOTECARIO'] },
+  },
   { path: 'catalogo/:id', component: Detallelibrocomponent, canActivate: [SesionGuard] },
   { path: 'prestamos', component: Prestamoscomponent, canActivate: [SesionGuard] },
   { path: 'prestamos/nuevo', component: Nuevoprestamocomponent, canActivate: [SesionGuard] },
@@ -58,6 +66,12 @@ const routes: Routes = [
   {
     path: 'auditoria',
     component: Auditoriacomponent,
+    canActivate: [SesionGuard],
+    data: { roles: ['ADMINISTRADOR'] },
+  },
+  {
+    path: 'administracion',
+    component: Administracioncomponent,
     canActivate: [SesionGuard],
     data: { roles: ['ADMINISTRADOR'] },
   },

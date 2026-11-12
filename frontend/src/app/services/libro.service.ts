@@ -1,14 +1,19 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
+import { AutorOpcionModel } from '../models/autor-opcion.model';
 import { AutorModel } from '../models/autor.model';
 import { CalificacionModel } from '../models/calificacion.model';
 import { DisponibilidadSedeModel } from '../models/disponibilidad-sede.model';
+import { EditorialModel } from '../models/editorial.model';
 import { EjemplarConsultaModel } from '../models/ejemplar-consulta.model';
+import { EjemplarRegistroModel } from '../models/ejemplar-registro.model';
 import { EjemplarModel } from '../models/ejemplar.model';
 import { FichaModel } from '../models/ficha.model';
 import { LibroDetalleModel } from '../models/libro-detalle.model';
+import { LibroRegistroModel } from '../models/libro-registro.model';
 import { LibroModel } from '../models/libro.model';
+import { ResultadoModel } from '../models/resultado.model';
 import { AuthService } from './auth.service';
 import { DatosService } from './datos.service';
 
@@ -101,6 +106,127 @@ export class LibroService {
           };
         }),
       );
+  }
+
+  public getEditoriales(): Observable<EditorialModel[]> {
+    return this.http
+      .get<unknown>(this.url + '/editoriales/', { headers: this.auth.getHeaders() })
+      .pipe(
+        map((respuesta) => {
+          if (!Array.isArray(respuesta)) {
+            throw this.datos.error();
+          }
+          const editoriales: EditorialModel[] = [];
+          for (const elemento of respuesta) {
+            const d = this.datos.objeto(elemento);
+            if (d === null) {
+              throw this.datos.error();
+            }
+            const idEditorial = this.datos.numero(d['id_editorial']);
+            const nombre = this.datos.texto(d['nombre']);
+            if (idEditorial === null || nombre === null) {
+              throw this.datos.error();
+            }
+            editoriales.push({
+              idEditorial: idEditorial,
+              nombre: nombre,
+              pais: this.datos.texto(d['pais']),
+            });
+          }
+          return editoriales;
+        }),
+      );
+  }
+
+  public getAutores(): Observable<AutorOpcionModel[]> {
+    return this.http.get<unknown>(this.url + '/autores/', { headers: this.auth.getHeaders() }).pipe(
+      map((respuesta) => {
+        if (!Array.isArray(respuesta)) {
+          throw this.datos.error();
+        }
+        const autores: AutorOpcionModel[] = [];
+        for (const elemento of respuesta) {
+          const d = this.datos.objeto(elemento);
+          if (d === null) {
+            throw this.datos.error();
+          }
+          const idAutor = this.datos.numero(d['id_autor']);
+          const nombres = this.datos.texto(d['nombres']);
+          const apellidos = this.datos.texto(d['apellidos']);
+          if (idAutor === null || nombres === null || apellidos === null) {
+            throw this.datos.error();
+          }
+          autores.push({
+            idAutor: idAutor,
+            nombres: nombres,
+            apellidos: apellidos,
+            nacionalidad: this.datos.texto(d['nacionalidad']),
+          });
+        }
+        return autores;
+      }),
+    );
+  }
+
+  public registrarLibro(libro: LibroRegistroModel): Observable<ResultadoModel> {
+    const autores: Record<string, unknown>[] = [];
+    for (const autor of libro.autores) {
+      autores.push({
+        id_autor: autor.idAutor,
+        nombres: autor.nombres,
+        apellidos: autor.apellidos,
+        nacionalidad: autor.nacionalidad,
+        rol_autor: autor.rolAutor,
+      });
+    }
+    const cuerpo = {
+      isbn: libro.isbn,
+      titulo: libro.titulo,
+      subtitulo: libro.subtitulo,
+      anio_publicacion: libro.anioPublicacion,
+      edicion: libro.edicion,
+      numero_paginas: libro.numeroPaginas,
+      idioma: libro.idioma,
+      id_editorial: libro.idEditorial,
+      id_categoria: libro.idCategoria,
+      autores: autores,
+      sinopsis: libro.sinopsis,
+      palabras_clave: libro.palabrasClave,
+      id_sede: libro.ejemplares.idSede,
+      cantidad: libro.ejemplares.cantidad,
+      ubicacion_estante: libro.ejemplares.ubicacionEstante,
+      valor_reposicion: libro.ejemplares.valorReposicion,
+    };
+    return this.http
+      .post<unknown>(this.url + '/libros/', cuerpo, { headers: this.auth.getHeaders() })
+      .pipe(map((respuesta) => this.datos.resultado(respuesta, 'p_id_libro')));
+  }
+
+  public registrarEjemplares(
+    idLibro: number,
+    ejemplares: EjemplarRegistroModel,
+  ): Observable<ResultadoModel> {
+    const cuerpo = {
+      id_sede: ejemplares.idSede,
+      cantidad: ejemplares.cantidad,
+      ubicacion_estante: ejemplares.ubicacionEstante,
+      valor_reposicion: ejemplares.valorReposicion,
+    };
+    return this.http
+      .post<unknown>(this.url + '/libros/' + idLibro + '/ejemplares/', cuerpo, {
+        headers: this.auth.getHeaders(),
+      })
+      .pipe(map((respuesta) => this.datos.resultado(respuesta, '')));
+  }
+
+  public cambiarEstadoEjemplar(idEjemplar: number, estado: string): Observable<ResultadoModel> {
+    return this.http
+      .post<unknown>(
+        this.url + '/ejemplares/' + idEjemplar + '/estado/',
+        { estado: estado },
+        { headers: this.auth.getHeaders() },
+      )
+      .pipe(map((respuesta) => this.datos.resultado(respuesta, '')));
   }
 
   private aLibro(valor: unknown): LibroModel {

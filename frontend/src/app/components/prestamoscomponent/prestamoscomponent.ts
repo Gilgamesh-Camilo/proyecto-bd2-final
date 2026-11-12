@@ -37,6 +37,7 @@ export class Prestamoscomponent implements OnInit {
   mensaje: string = '';
   errorAccion: string = '';
   renovando: number | null = null;
+  puedeMultar: boolean = false;
 
   constructor(
     private auth: AuthService,
@@ -49,6 +50,7 @@ export class Prestamoscomponent implements OnInit {
 
   ngOnInit(): void {
     this.mensaje = this.datos.mensajeNavegacion();
+    this.puedeMultar = this.auth.tieneRol(['ADMINISTRADOR', 'BIBLIOTECARIO']);
     this.catalogoService.getCatalogos().subscribe({
       next: (catalogos) => {
         this.sedes = catalogos.sedes;

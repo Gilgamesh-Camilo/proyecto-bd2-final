@@ -13,6 +13,7 @@ import { Panelcomponent } from './components/panelcomponent/panelcomponent';
 import { Catalogocomponent } from './components/catalogocomponent/catalogocomponent';
 import { Tarjetalibrocomponent } from './components/tarjetalibrocomponent/tarjetalibrocomponent';
 import { Detallelibrocomponent } from './components/detallelibrocomponent/detallelibrocomponent';
+import { Nuevolibrocomponent } from './components/nuevolibrocomponent/nuevolibrocomponent';
 import { Prestamoscomponent } from './components/prestamoscomponent/prestamoscomponent';
 import { Nuevoprestamocomponent } from './components/nuevoprestamocomponent/nuevoprestamocomponent';
 import { Devolucioncomponent } from './components/devolucioncomponent/devolucioncomponent';
@@ -26,6 +27,7 @@ import { Trasladoscomponent } from './components/trasladoscomponent/trasladoscom
 import { Nuevotrasladocomponent } from './components/nuevotrasladocomponent/nuevotrasladocomponent';
 import { Estadisticascomponent } from './components/estadisticascomponent/estadisticascomponent';
 import { Auditoriacomponent } from './components/auditoriacomponent/auditoriacomponent';
+import { Administracioncomponent } from './components/administracioncomponent/administracioncomponent';
 import { EstadoPipe } from './pipes/estado-pipe';
 
 registerLocaleData(localeEsCo);
@@ -40,6 +42,7 @@ registerLocaleData(localeEsCo);
     Catalogocomponent,
     Tarjetalibrocomponent,
     Detallelibrocomponent,
+    Nuevolibrocomponent,
     Prestamoscomponent,
     Nuevoprestamocomponent,
     Devolucioncomponent,
@@ -53,6 +56,7 @@ registerLocaleData(localeEsCo);
     Nuevotrasladocomponent,
     Estadisticascomponent,
     Auditoriacomponent,
+    Administracioncomponent,
     EstadoPipe,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule],
