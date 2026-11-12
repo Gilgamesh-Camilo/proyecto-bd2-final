@@ -21,6 +21,8 @@ export class Multascomponent implements OnInit {
   pagando: number | null = null;
   confirmando: number | null = null;
   puedeCobrar: boolean = false;
+  puedeCondonar: boolean = false;
+  confirmandoCondonar: number | null = null;
 
   constructor(
     private auth: AuthService,
@@ -30,6 +32,7 @@ export class Multascomponent implements OnInit {
 
   ngOnInit(): void {
     this.puedeCobrar = this.auth.tieneRol(['ADMINISTRADOR', 'BIBLIOTECARIO']);
+    this.puedeCondonar = this.auth.tieneRol(['ADMINISTRADOR']);
     this.cargar();
   }
 
@@ -87,6 +90,33 @@ export class Multascomponent implements OnInit {
     }
     this.pagando = multa.idPrestamo;
     this.multaService.pagarMulta(multa.idPrestamo).subscribe({
+      next: (resultado) => {
+        this.mensaje = multa.socio + ': ' + resultado.mensaje;
+        this.pagando = null;
+        this.cargar();
+      },
+      error: (e: unknown) => {
+        this.errorAccion = this.auth.mensajeError(e);
+        this.pagando = null;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  condonar(multa: MultaModel): void {
+    this.mensaje = '';
+    this.errorAccion = '';
+    this.confirmandoCondonar = null;
+    if (!this.puedeCondonar) {
+      this.errorAccion = 'Solo el administrador puede condonar multas.';
+      return;
+    }
+    if (multa.estado !== 'PENDIENTE') {
+      this.errorAccion = 'Esa multa ya no está pendiente.';
+      return;
+    }
+    this.pagando = multa.idPrestamo;
+    this.multaService.condonarMulta(multa.idPrestamo).subscribe({
       next: (resultado) => {
         this.mensaje = multa.socio + ': ' + resultado.mensaje;
         this.pagando = null;

@@ -2,17 +2,24 @@
   <div class="container animate__animated animate__fadeIn">
     <div class="encabezado-fila">
       <h1>Catálogo</h1>
-      <ul class="cifras">
-        @if (!cargando && error === '') {
-          <li>
-            <i class="fa-solid fa-book" aria-hidden="true"></i>{{ libros.length }}
-            {{ libros.length === 1 ? 'título' : 'títulos' }}
-          </li>
+      <div class="encabezado-acciones gap-4">
+        <ul class="cifras">
+          @if (!cargando && error === '') {
+            <li>
+              <i class="fa-solid fa-book" aria-hidden="true"></i>{{ libros.length }}
+              {{ libros.length === 1 ? 'título' : 'títulos' }}
+            </li>
+          }
+          @if (sedes.length > 0) {
+            <li><i class="fa-solid fa-building" aria-hidden="true"></i>{{ sedes.length }} sedes</li>
+          }
+        </ul>
+        @if (puedeRegistrar) {
+          <a class="boton-principal" routerLink="/catalogo/nuevo">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>Nuevo libro
+          </a>
         }
-        @if (sedes.length > 0) {
-          <li><i class="fa-solid fa-building" aria-hidden="true"></i>{{ sedes.length }} sedes</li>
-        }
-      </ul>
+      </div>
     </div>
   </div>
 </section>

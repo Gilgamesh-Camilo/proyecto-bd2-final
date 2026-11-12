@@ -24,3 +24,15 @@
   padding: 0 1.8rem;
   font-size: 1.05rem;
 }
+
+.boton-alineado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+@media (min-width: 768px) {
+  .boton-alineado {
+    margin-top: 1.95rem;
+  }
+}

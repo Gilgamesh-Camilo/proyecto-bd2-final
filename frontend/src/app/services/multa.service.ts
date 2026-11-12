@@ -32,6 +32,16 @@ export class MultaService {
       .pipe(map((respuesta) => this.datos.resultado(respuesta, '')));
   }
 
+  public condonarMulta(idPrestamo: number): Observable<ResultadoModel> {
+    return this.http
+      .post<unknown>(
+        this.url + idPrestamo + '/condonacion/',
+        {},
+        { headers: this.auth.getHeaders() },
+      )
+      .pipe(map((respuesta) => this.datos.resultado(respuesta, '')));
+  }
+
   public aMultas(valor: unknown): MultaModel[] {
     if (!Array.isArray(valor)) {
       throw this.datos.error();

@@ -33,6 +33,7 @@ export class Catalogocomponent implements OnInit {
   error: string = '';
   errorCatalogos: string = '';
   errorEstadisticas: string = '';
+  puedeRegistrar: boolean = false;
 
   constructor(
     private auth: AuthService,
@@ -43,6 +44,7 @@ export class Catalogocomponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.puedeRegistrar = this.auth.tieneRol(['ADMINISTRADOR', 'BIBLIOTECARIO']);
     this.catalogoService.getCatalogos().subscribe({
       next: (catalogos) => {
         this.sedes = catalogos.sedes;
