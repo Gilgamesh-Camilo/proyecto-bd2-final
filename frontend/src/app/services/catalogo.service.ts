@@ -31,8 +31,8 @@ export class CatalogoService {
           throw this.datos.error();
         }
         return {
-          postgresql: conexiones['postgresql'] === true,
-          mongodb: conexiones['mongodb'] === true,
+          operacion: conexiones['postgresql'] === true,
+          fichas: conexiones['mongodb'] === true,
         };
       }),
     );

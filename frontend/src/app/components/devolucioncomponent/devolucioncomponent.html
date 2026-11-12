@@ -108,6 +108,107 @@
   </div>
 </section>
 
+@if (detalle && puedeMultar && (estaAbierto() || puedeRegistrarDano() || mensajeMulta !== '')) {
+  <section class="franja tono-crema" data-bs-theme="light" aria-labelledby="titulo-novedad">
+    <div class="container">
+      <h2 class="franja-titulo mb-3" id="titulo-novedad">Daño o pérdida</h2>
+      @if (mensajeMulta !== '') {
+        <div class="alert alert-success" role="status">
+          <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensajeMulta }}
+        </div>
+      }
+      @if (estaAbierto()) {
+        <p class="texto-suave">
+          Si el socio perdió el ejemplar, el préstamo se cierra como perdido y se cobra el valor de
+          reposición. Escribe otro valor solo si es distinto.
+        </p>
+        <div class="row g-3 align-items-start">
+          <div class="col-md-4">
+            <label class="form-label" for="valor-perdida"
+              >Valor de la multa <span class="texto-suave">(opcional)</span></label
+            >
+            <input
+              id="valor-perdida"
+              name="valorPerdida"
+              type="number"
+              class="form-control"
+              min="0"
+              step="0.01"
+              placeholder="Ej. 62000"
+              [(ngModel)]="valorPerdida"
+              (ngModelChange)="errorValorPerdida = ''; confirmandoPerdida = false"
+              [class.is-invalid]="errorValorPerdida !== ''"
+            />
+            <div class="invalid-feedback">{{ errorValorPerdida }}</div>
+          </div>
+          <div class="col-md-8 boton-alineado">
+            @if (confirmandoPerdida) {
+              <button
+                class="boton-peligro"
+                type="button"
+                (click)="registrarPerdida()"
+                [disabled]="guardandoMulta"
+              >
+                Confirmar pérdida
+              </button>
+              <button class="boton-secundario" type="button" (click)="confirmandoPerdida = false">
+                No
+              </button>
+            } @else {
+              <button
+                class="boton-secundario"
+                type="button"
+                (click)="pedirPerdida()"
+                [disabled]="guardandoMulta"
+              >
+                <i class="fa-solid fa-book-skull" aria-hidden="true"></i>Reportar pérdida
+              </button>
+            }
+          </div>
+        </div>
+      } @else if (puedeRegistrarDano()) {
+        <p class="texto-suave">
+          El ejemplar pasa a reparación. Si el préstamo ya tiene una multa por retraso pendiente, el
+          valor del daño se suma a esa multa.
+        </p>
+        <div class="row g-3 align-items-start">
+          <div class="col-md-4">
+            <label class="form-label" for="valor-dano">Valor de la multa por daño</label>
+            <input
+              id="valor-dano"
+              name="valorDano"
+              type="number"
+              class="form-control"
+              min="0"
+              step="0.01"
+              placeholder="Ej. 18000"
+              [(ngModel)]="valorDano"
+              (ngModelChange)="errorValorDano = ''"
+              [class.is-invalid]="errorValorDano !== ''"
+            />
+            <div class="invalid-feedback">{{ errorValorDano }}</div>
+          </div>
+          <div class="col-md-8 boton-alineado">
+            <button
+              class="boton-secundario"
+              type="button"
+              (click)="registrarDano()"
+              [disabled]="guardandoMulta"
+            >
+              <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>Registrar daño
+            </button>
+          </div>
+        </div>
+      }
+      @if (errorMulta !== '') {
+        <div class="alert alert-danger mt-3 mb-0" role="alert">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorMulta }}
+        </div>
+      }
+    </div>
+  </section>
+}
+
 @if (detalle) {
   <section class="franja tono-arena" data-bs-theme="light" aria-labelledby="titulo-datos">
     <div class="container">

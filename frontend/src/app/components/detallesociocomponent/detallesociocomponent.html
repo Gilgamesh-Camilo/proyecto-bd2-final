@@ -108,6 +108,80 @@
         </div>
       </div>
 
+      @if (puedeGestionar) {
+        <div class="acciones-socio">
+          @if (confirmando !== '') {
+            <button class="boton-peligro boton-pequeno" type="button" (click)="confirmar()">
+              {{ textoConfirmacion() }}
+            </button>
+            <button class="boton-secundario boton-pequeno" type="button" (click)="confirmando = ''">
+              No
+            </button>
+          } @else {
+            @if (detalle.socio.estado === 'ACTIVO') {
+              <button
+                class="boton-secundario boton-pequeno"
+                type="button"
+                [disabled]="guardando"
+                (click)="pedir('SUSPENDIDO')"
+              >
+                <i class="fa-solid fa-user-clock" aria-hidden="true"></i>Suspender
+              </button>
+            } @else {
+              <button
+                class="boton-secundario boton-pequeno"
+                type="button"
+                [disabled]="guardando"
+                (click)="pedir('ACTIVO')"
+              >
+                <i class="fa-solid fa-user-check" aria-hidden="true"></i>Reactivar
+              </button>
+            }
+            @if (detalle.socio.estado !== 'RETIRADO') {
+              <button
+                class="boton-secundario boton-pequeno"
+                type="button"
+                [disabled]="guardando"
+                (click)="pedir('RETIRADO')"
+              >
+                <i class="fa-solid fa-user-slash" aria-hidden="true"></i>Retirar
+              </button>
+            }
+            @if (puedeRenovarCarne()) {
+              <button
+                class="boton-secundario boton-pequeno"
+                type="button"
+                [disabled]="guardando"
+                (click)="pedir('CARNE')"
+              >
+                <i class="fa-solid fa-address-card" aria-hidden="true"></i>Renovar carné
+              </button>
+            }
+          }
+        </div>
+        @if (mensaje !== '') {
+          <div class="alert alert-success alert-dismissible" role="status">
+            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensaje }}
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Cerrar"
+              (click)="mensaje = ''"
+            ></button>
+          </div>
+        }
+        @if (errorAccion !== '') {
+          <div class="alert alert-danger alert-dismissible" role="alert">
+            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorAccion }}
+            <button
+              type="button"
+              class="btn-close"
+              aria-label="Cerrar"
+              (click)="errorAccion = ''"
+            ></button>
+          </div>
+        }
+      }
       <dl class="datos ficha-socio">
         <div>
           <dt><i class="fa-solid fa-address-card" aria-hidden="true"></i>Carné</dt>
@@ -317,7 +391,8 @@
       </h2>
       @if (detalle.listasLectura === null) {
         <p class="texto-suave mb-0">
-          <i class="fa-solid fa-plug-circle-xmark me-2" aria-hidden="true"></i>MongoDB no respondió.
+          <i class="fa-solid fa-plug-circle-xmark me-2" aria-hidden="true"></i>No se pudieron cargar
+          las listas.
         </p>
       } @else {
         <div class="listas">

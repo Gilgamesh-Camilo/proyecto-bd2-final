@@ -78,6 +78,19 @@ export class PrestamoService {
       .pipe(map((respuesta) => this.datos.resultado(respuesta, '')));
   }
 
+  public registrarMulta(
+    idPrestamo: number,
+    motivo: string,
+    valor: number | null,
+  ): Observable<ResultadoModel> {
+    const cuerpo = { motivo: motivo, valor: valor };
+    return this.http
+      .post<unknown>(this.url + idPrestamo + '/multa/', cuerpo, {
+        headers: this.auth.getHeaders(),
+      })
+      .pipe(map((respuesta) => this.datos.resultado(respuesta, '')));
+  }
+
   public renovarPrestamo(idPrestamo: number): Observable<ResultadoModel> {
     return this.http
       .post<unknown>(

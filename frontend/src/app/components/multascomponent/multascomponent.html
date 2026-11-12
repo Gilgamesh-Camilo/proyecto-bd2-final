@@ -119,7 +119,22 @@
                 <td>
                   @if (m.estado === 'PENDIENTE' && puedeCobrar) {
                     <div class="acciones-fila">
-                      @if (confirmando === m.idPrestamo) {
+                      @if (confirmandoCondonar === m.idPrestamo) {
+                        <button
+                          class="boton-peligro boton-pequeno"
+                          type="button"
+                          (click)="condonar(m)"
+                        >
+                          Confirmar condonación
+                        </button>
+                        <button
+                          class="boton-secundario boton-pequeno"
+                          type="button"
+                          (click)="confirmandoCondonar = null"
+                        >
+                          No
+                        </button>
+                      } @else if (confirmando === m.idPrestamo) {
                         <button
                           class="boton-principal boton-pequeno"
                           type="button"
@@ -151,6 +166,18 @@
                             <i class="fa-solid fa-coins" aria-hidden="true"></i>Cobrar
                           }
                         </button>
+                        @if (puedeCondonar) {
+                          <button
+                            class="boton-secundario boton-pequeno boton-icono"
+                            type="button"
+                            (click)="confirmandoCondonar = m.idPrestamo"
+                            [disabled]="pagando !== null"
+                            [title]="'Condonar la multa de ' + m.socio"
+                            [attr.aria-label]="'Condonar la multa de ' + m.socio"
+                          >
+                            <i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i>
+                          </button>
+                        }
                       }
                     </div>
                   }

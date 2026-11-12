@@ -84,6 +84,17 @@
               {{ disponiblesEnMiSede() === 1 ? 'libre' : 'libres' }} en tu sede
             </span>
           </div>
+          @if (mensajeEjemplares !== '') {
+            <div class="alert alert-success alert-dismissible" role="status">
+              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ mensajeEjemplares }}
+              <button
+                type="button"
+                class="btn-close"
+                aria-label="Cerrar"
+                (click)="mensajeEjemplares = ''"
+              ></button>
+            </div>
+          }
           @if (libro.ejemplares.length === 0) {
             <div class="vacio">
               <i class="fa-solid fa-box-open" aria-hidden="true"></i>
@@ -133,6 +144,17 @@
                               <i class="fa-solid fa-right-left" aria-hidden="true"></i>
                             </a>
                           }
+                          @if (puedeCambiarEstado(e)) {
+                            <button
+                              type="button"
+                              class="boton-secundario boton-pequeno boton-icono"
+                              [title]="'Cambiar el estado de ' + e.codigoBarras"
+                              [attr.aria-label]="'Cambiar el estado de ' + e.codigoBarras"
+                              (click)="abrirEstado(e)"
+                            >
+                              <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                            </button>
+                          }
                         </div>
                       </td>
                     </tr>
@@ -140,6 +162,177 @@
                 </tbody>
               </table>
             </div>
+          }
+          @if (ejemplarEstado) {
+            <form class="agregar-ejemplares mt-3" (ngSubmit)="cambiarEstado()" novalidate>
+              <h3 class="titulo-agregar">
+                <i class="fa-solid fa-pen" aria-hidden="true"></i>Estado de
+                {{ ejemplarEstado.codigoBarras }}
+              </h3>
+              <p class="small texto-suave">
+                Ahora está {{ ejemplarEstado.estado | estado | lowercase }}. Un ejemplar dado de
+                baja no vuelve a circular.
+              </p>
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <label class="form-label" for="nuevo-estado">Nuevo estado</label>
+                  <select
+                    id="nuevo-estado"
+                    name="nuevoEstado"
+                    class="form-select"
+                    [(ngModel)]="nuevoEstado"
+                    (ngModelChange)="errorNuevoEstado = ''"
+                    [class.is-invalid]="errorNuevoEstado !== ''"
+                  >
+                    <option value="">Elige un estado</option>
+                    @for (opcion of estadosPara(ejemplarEstado.estado); track opcion) {
+                      <option [value]="opcion">{{ opcion | estado }}</option>
+                    }
+                  </select>
+                  <div class="invalid-feedback">{{ errorNuevoEstado }}</div>
+                </div>
+              </div>
+              @if (errorCambioEstado !== '') {
+                <div class="alert alert-danger py-2 mt-3 mb-0" role="alert">
+                  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i
+                  >{{ errorCambioEstado }}
+                </div>
+              }
+              <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">
+                <button
+                  type="button"
+                  class="boton-secundario boton-pequeno"
+                  (click)="cerrarEstado()"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  class="boton-principal boton-pequeno"
+                  [disabled]="guardandoEstado"
+                >
+                  @if (guardandoEstado) {
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                    Guardando...
+                  } @else {
+                    <i class="fa-solid fa-check" aria-hidden="true"></i>Guardar estado
+                  }
+                </button>
+              </div>
+            </form>
+          }
+          @if (puedeAgregarEjemplares && !ejemplarEstado) {
+            @if (!mostrandoEjemplares) {
+              <button
+                type="button"
+                class="boton-secundario boton-pequeno mt-3"
+                (click)="abrirEjemplares()"
+              >
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>Agregar ejemplares
+              </button>
+            } @else {
+              <form class="agregar-ejemplares mt-3" (ngSubmit)="agregarEjemplares()" novalidate>
+                <h3 class="titulo-agregar">
+                  <i class="fa-solid fa-barcode" aria-hidden="true"></i>Agregar ejemplares
+                </h3>
+                <p class="small texto-suave">Los códigos de barras se asignan al guardar.</p>
+                <div class="row g-3">
+                  <div class="col-sm-6">
+                    <label class="form-label" for="sede-ejemplares">Sede</label>
+                    <select
+                      id="sede-ejemplares"
+                      name="idSede"
+                      class="form-select"
+                      [(ngModel)]="idSede"
+                      (ngModelChange)="errorSede = ''"
+                      [class.is-invalid]="errorSede !== ''"
+                    >
+                      <option [ngValue]="null">Elige una sede</option>
+                      @for (s of sedes; track s.idSede) {
+                        <option [ngValue]="s.idSede">{{ s.nombre }}</option>
+                      }
+                    </select>
+                    <div class="invalid-feedback">{{ errorSede }}</div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label" for="cantidad-ejemplares">Cantidad</label>
+                    <input
+                      id="cantidad-ejemplares"
+                      name="cantidad"
+                      type="number"
+                      class="form-control"
+                      min="1"
+                      max="20"
+                      [(ngModel)]="cantidad"
+                      (ngModelChange)="errorCantidad = ''"
+                      [class.is-invalid]="errorCantidad !== ''"
+                    />
+                    <div class="invalid-feedback">{{ errorCantidad }}</div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label" for="ubicacion-ejemplares"
+                      >Ubicación <span class="texto-suave">(opcional)</span></label
+                    >
+                    <input
+                      id="ubicacion-ejemplares"
+                      name="ubicacionEstante"
+                      type="text"
+                      class="form-control"
+                      placeholder="Ej. 863 O85 C1"
+                      [(ngModel)]="ubicacionEstante"
+                      (ngModelChange)="errorUbicacion = ''"
+                      [class.is-invalid]="errorUbicacion !== ''"
+                    />
+                    <div class="invalid-feedback">{{ errorUbicacion }}</div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label" for="valor-ejemplares"
+                      >Valor <span class="texto-suave">(opcional)</span></label
+                    >
+                    <input
+                      id="valor-ejemplares"
+                      name="valorReposicion"
+                      type="number"
+                      class="form-control"
+                      min="0"
+                      step="0.01"
+                      placeholder="Ej. 48000"
+                      [(ngModel)]="valorReposicion"
+                      (ngModelChange)="errorValor = ''"
+                      [class.is-invalid]="errorValor !== ''"
+                    />
+                    <div class="invalid-feedback">{{ errorValor }}</div>
+                  </div>
+                </div>
+                @if (errorEjemplares !== '') {
+                  <div class="alert alert-danger py-2 mt-3 mb-0" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i
+                    >{{ errorEjemplares }}
+                  </div>
+                }
+                <div class="d-flex flex-wrap justify-content-end gap-2 mt-3">
+                  <button
+                    type="button"
+                    class="boton-secundario boton-pequeno"
+                    (click)="cerrarEjemplares()"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    class="boton-principal boton-pequeno"
+                    [disabled]="guardandoEjemplares"
+                  >
+                    @if (guardandoEjemplares) {
+                      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                      Guardando...
+                    } @else {
+                      <i class="fa-solid fa-plus" aria-hidden="true"></i>Agregar
+                    }
+                  </button>
+                </div>
+              </form>
+            }
           }
         </div>
 
@@ -243,7 +436,7 @@
       } @else {
         <p class="texto-suave mb-0">
           <i class="fa-solid fa-circle-info me-2" aria-hidden="true"></i>Sin ficha: el libro no
-          tiene una o MongoDB no respondió.
+          tiene una o no se pudo cargar.
         </p>
       }
     </div>

@@ -28,6 +28,25 @@
   background: rgba(244, 244, 241, 0.28);
 }
 
+.agregar-ejemplares {
+  padding: 1.1rem 1.25rem 1.25rem;
+  background: var(--campo);
+  border: 1px solid var(--linea);
+  border-radius: 18px;
+}
+
+.titulo-agregar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+}
+
+.titulo-agregar i {
+  color: var(--acento);
+}
+
 .datos-libro {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

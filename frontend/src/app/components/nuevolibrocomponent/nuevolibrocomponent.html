@@ -1,0 +1,434 @@
+<section class="encabezado-pagina">
+  <div class="container animate__animated animate__fadeIn">
+    <a class="volver" routerLink="/catalogo"
+      ><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>Catálogo</a
+    >
+    <h1>Nuevo libro</h1>
+  </div>
+</section>
+
+<form (ngSubmit)="registrar()" novalidate>
+  <section class="franja tono-crema" data-bs-theme="light" aria-label="Datos del libro">
+    <div class="container">
+      @if (errorCarga !== '') {
+        <div class="alert alert-warning">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>No se cargaron todas
+          las listas del formulario: {{ errorCarga }}
+        </div>
+      }
+      <h2 class="subtitulo-franja">
+        <i class="fa-solid fa-book" aria-hidden="true"></i>Datos del libro
+      </h2>
+      <div class="row g-3 mb-5">
+        <div class="col-md-4">
+          <label class="form-label" for="isbn">ISBN</label>
+          <input
+            id="isbn"
+            name="isbn"
+            type="text"
+            inputmode="numeric"
+            class="form-control"
+            placeholder="Ej. 9789585550073"
+            [(ngModel)]="isbn"
+            (ngModelChange)="errorIsbn = ''"
+            [class.is-invalid]="errorIsbn !== ''"
+          />
+          <div class="invalid-feedback">{{ errorIsbn }}</div>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label" for="titulo">Título</label>
+          <input
+            id="titulo"
+            name="titulo"
+            type="text"
+            class="form-control"
+            placeholder="Ej. Cuentos de la ribera"
+            [(ngModel)]="titulo"
+            (ngModelChange)="errorTitulo = ''"
+            [class.is-invalid]="errorTitulo !== ''"
+          />
+          <div class="invalid-feedback">{{ errorTitulo }}</div>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="subtitulo"
+            >Subtítulo <span class="texto-suave">(opcional)</span></label
+          >
+          <input
+            id="subtitulo"
+            name="subtitulo"
+            type="text"
+            class="form-control"
+            placeholder="Ej. Relatos del bajo Magdalena"
+            [(ngModel)]="subtitulo"
+            (ngModelChange)="errorSubtitulo = ''"
+            [class.is-invalid]="errorSubtitulo !== ''"
+          />
+          <div class="invalid-feedback">{{ errorSubtitulo }}</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="editorial">Editorial</label>
+          <select
+            id="editorial"
+            name="idEditorial"
+            class="form-select"
+            [(ngModel)]="idEditorial"
+            (ngModelChange)="errorEditorial = ''"
+            [class.is-invalid]="errorEditorial !== ''"
+          >
+            <option [ngValue]="null">Elige una editorial</option>
+            @for (e of editoriales; track e.idEditorial) {
+              <option [ngValue]="e.idEditorial">
+                {{ e.nombre }}{{ e.pais ? ' (' + e.pais + ')' : '' }}
+              </option>
+            }
+          </select>
+          <div class="invalid-feedback">{{ errorEditorial }}</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="categoria">Categoría</label>
+          <select
+            id="categoria"
+            name="idCategoria"
+            class="form-select"
+            [(ngModel)]="idCategoria"
+            (ngModelChange)="errorCategoria = ''"
+            [class.is-invalid]="errorCategoria !== ''"
+          >
+            <option [ngValue]="null">Elige una categoría</option>
+            @for (c of categorias; track c.idCategoria) {
+              <option [ngValue]="c.idCategoria">{{ c.codigoDewey }} - {{ c.nombre }}</option>
+            }
+          </select>
+          <div class="invalid-feedback">{{ errorCategoria }}</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="idioma">Idioma</label>
+          <select
+            id="idioma"
+            name="idioma"
+            class="form-select"
+            [(ngModel)]="idioma"
+            (ngModelChange)="errorIdioma = ''"
+            [class.is-invalid]="errorIdioma !== ''"
+          >
+            @for (i of idiomas; track i) {
+              <option [value]="i">{{ nombreIdioma(i) }}</option>
+            }
+          </select>
+          <div class="invalid-feedback">{{ errorIdioma }}</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="anio"
+            >Año de publicación <span class="texto-suave">(opcional)</span></label
+          >
+          <input
+            id="anio"
+            name="anioPublicacion"
+            type="number"
+            class="form-control"
+            min="1450"
+            [max]="anioActual"
+            placeholder="Ej. 2019"
+            [(ngModel)]="anioPublicacion"
+            (ngModelChange)="errorAnio = ''"
+            [class.is-invalid]="errorAnio !== ''"
+          />
+          <div class="invalid-feedback">{{ errorAnio }}</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="edicion">Edición</label>
+          <input
+            id="edicion"
+            name="edicion"
+            type="number"
+            class="form-control"
+            min="1"
+            [(ngModel)]="edicion"
+            (ngModelChange)="errorEdicion = ''"
+            [class.is-invalid]="errorEdicion !== ''"
+          />
+          <div class="invalid-feedback">{{ errorEdicion }}</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="paginas"
+            >Número de páginas <span class="texto-suave">(opcional)</span></label
+          >
+          <input
+            id="paginas"
+            name="numeroPaginas"
+            type="number"
+            class="form-control"
+            min="1"
+            placeholder="Ej. 236"
+            [(ngModel)]="numeroPaginas"
+            (ngModelChange)="errorPaginas = ''"
+            [class.is-invalid]="errorPaginas !== ''"
+          />
+          <div class="invalid-feedback">{{ errorPaginas }}</div>
+        </div>
+      </div>
+
+      <h2 class="subtitulo-franja">
+        <i class="fa-solid fa-feather" aria-hidden="true"></i>Autores
+      </h2>
+      <p class="texto-suave">
+        Elige a cada autor de la lista o regístralo aquí si todavía no existe. El orden de la lista
+        es el orden en que aparecen en el libro.
+      </p>
+      @for (fila of autores; track fila; let i = $index) {
+        <div class="autor-fila">
+          <div class="autor-cabeza">
+            <span>Autor {{ i + 1 }}</span>
+            <button
+              type="button"
+              class="boton-secundario boton-pequeno boton-icono"
+              [disabled]="autores.length === 1"
+              [title]="'Quitar autor ' + (i + 1)"
+              [attr.aria-label]="'Quitar autor ' + (i + 1)"
+              (click)="quitarAutor(i)"
+            >
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" [for]="'origen-' + i">Origen</label>
+              <select
+                class="form-select"
+                [id]="'origen-' + i"
+                [name]="'origen-' + i"
+                [(ngModel)]="fila.origen"
+                (ngModelChange)="cambiarOrigen(fila)"
+              >
+                <option value="REGISTRADO">Ya registrado</option>
+                <option value="NUEVO">Autor nuevo</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" [for]="'rol-' + i">Rol</label>
+              <select
+                class="form-select"
+                [id]="'rol-' + i"
+                [name]="'rol-' + i"
+                [(ngModel)]="fila.rolAutor"
+                (ngModelChange)="fila.errorRol = ''"
+                [class.is-invalid]="fila.errorRol !== ''"
+              >
+                @for (r of roles; track r) {
+                  <option [value]="r">{{ nombreRol(r) }}</option>
+                }
+              </select>
+              <div class="invalid-feedback">{{ fila.errorRol }}</div>
+            </div>
+            @if (fila.origen === 'REGISTRADO') {
+              <div class="col-12">
+                <label class="form-label" [for]="'autor-' + i">Autor</label>
+                <select
+                  class="form-select"
+                  [id]="'autor-' + i"
+                  [name]="'autor-' + i"
+                  [(ngModel)]="fila.idAutor"
+                  (ngModelChange)="fila.errorAutor = ''"
+                  [class.is-invalid]="fila.errorAutor !== ''"
+                >
+                  <option [ngValue]="null">Elige un autor</option>
+                  @for (a of autoresRegistrados; track a.idAutor) {
+                    <option [ngValue]="a.idAutor">
+                      {{ a.apellidos }}, {{ a.nombres
+                      }}{{ a.nacionalidad ? ' (' + a.nacionalidad + ')' : '' }}
+                    </option>
+                  }
+                </select>
+                <div class="invalid-feedback">{{ fila.errorAutor }}</div>
+              </div>
+            } @else {
+              <div class="col-md-4">
+                <label class="form-label" [for]="'nombres-' + i">Nombres</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Ej. Celmira"
+                  [id]="'nombres-' + i"
+                  [name]="'nombres-' + i"
+                  [(ngModel)]="fila.nombres"
+                  (ngModelChange)="fila.errorNombres = ''"
+                  [class.is-invalid]="fila.errorNombres !== ''"
+                />
+                <div class="invalid-feedback">{{ fila.errorNombres }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" [for]="'apellidos-' + i">Apellidos</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Ej. Ospina Durán"
+                  [id]="'apellidos-' + i"
+                  [name]="'apellidos-' + i"
+                  [(ngModel)]="fila.apellidos"
+                  (ngModelChange)="fila.errorApellidos = ''"
+                  [class.is-invalid]="fila.errorApellidos !== ''"
+                />
+                <div class="invalid-feedback">{{ fila.errorApellidos }}</div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label" [for]="'nacionalidad-' + i"
+                  >Nacionalidad <span class="texto-suave">(opcional)</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Ej. Colombiana"
+                  [id]="'nacionalidad-' + i"
+                  [name]="'nacionalidad-' + i"
+                  [(ngModel)]="fila.nacionalidad"
+                  (ngModelChange)="fila.errorNacionalidad = ''"
+                  [class.is-invalid]="fila.errorNacionalidad !== ''"
+                />
+                <div class="invalid-feedback">{{ fila.errorNacionalidad }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      @if (errorAutores !== '') {
+        <div class="alert alert-danger py-2" role="alert">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorAutores }}
+        </div>
+      }
+      <div class="mb-5">
+        <button type="button" class="boton-secundario boton-pequeno" (click)="agregarAutor()">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>Agregar autor
+        </button>
+      </div>
+
+      <h2 class="subtitulo-franja">
+        <i class="fa-solid fa-barcode" aria-hidden="true"></i>Primeros ejemplares
+      </h2>
+      <p class="texto-suave">Los códigos de barras se asignan al guardar.</p>
+      <div class="row g-3 mb-5">
+        <div class="col-md-3">
+          <label class="form-label" for="sede">Sede</label>
+          <select
+            id="sede"
+            name="idSede"
+            class="form-select"
+            [(ngModel)]="idSede"
+            (ngModelChange)="errorSede = ''"
+            [class.is-invalid]="errorSede !== ''"
+          >
+            <option [ngValue]="null">Elige una sede</option>
+            @for (s of sedes; track s.idSede) {
+              <option [ngValue]="s.idSede">{{ s.nombre }}</option>
+            }
+          </select>
+          <div class="invalid-feedback">{{ errorSede }}</div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="cantidad">Cantidad</label>
+          <input
+            id="cantidad"
+            name="cantidad"
+            type="number"
+            class="form-control"
+            min="1"
+            max="20"
+            [(ngModel)]="cantidad"
+            (ngModelChange)="errorCantidad = ''"
+            [class.is-invalid]="errorCantidad !== ''"
+          />
+          <div class="invalid-feedback">{{ errorCantidad }}</div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="ubicacion"
+            >Ubicación en estante <span class="texto-suave">(opcional)</span></label
+          >
+          <input
+            id="ubicacion"
+            name="ubicacionEstante"
+            type="text"
+            class="form-control"
+            placeholder="Ej. 863 O85 C1"
+            [(ngModel)]="ubicacionEstante"
+            (ngModelChange)="errorUbicacion = ''"
+            [class.is-invalid]="errorUbicacion !== ''"
+          />
+          <div class="invalid-feedback">{{ errorUbicacion }}</div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="valor"
+            >Valor de reposición <span class="texto-suave">(opcional)</span></label
+          >
+          <input
+            id="valor"
+            name="valorReposicion"
+            type="number"
+            class="form-control"
+            min="0"
+            step="0.01"
+            placeholder="Ej. 48000"
+            [(ngModel)]="valorReposicion"
+            (ngModelChange)="errorValor = ''"
+            [class.is-invalid]="errorValor !== ''"
+          />
+          <div class="invalid-feedback">{{ errorValor }}</div>
+        </div>
+      </div>
+
+      <h2 class="subtitulo-franja">
+        <i class="fa-solid fa-leaf" aria-hidden="true"></i>Ficha
+        <span class="chip">Opcional</span>
+      </h2>
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label" for="sinopsis">Sinopsis</label>
+          <textarea
+            id="sinopsis"
+            name="sinopsis"
+            rows="4"
+            class="form-control"
+            placeholder="De qué trata el libro, en pocas líneas"
+            [(ngModel)]="sinopsis"
+            (ngModelChange)="errorSinopsis = ''"
+            [class.is-invalid]="errorSinopsis !== ''"
+          ></textarea>
+          <div class="invalid-feedback">{{ errorSinopsis }}</div>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="palabras">Palabras clave, separadas por coma</label>
+          <input
+            id="palabras"
+            name="palabrasClave"
+            type="text"
+            class="form-control"
+            placeholder="Ej. río, pesca, memoria"
+            [(ngModel)]="palabrasClave"
+            (ngModelChange)="errorPalabras = ''"
+            [class.is-invalid]="errorPalabras !== ''"
+          />
+          <div class="invalid-feedback">{{ errorPalabras }}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="franja tono-negro" aria-label="Guardar">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-end align-items-center gap-2">
+        <a class="boton-secundario" routerLink="/catalogo">Cancelar</a>
+        <button class="boton-principal" type="submit" [disabled]="guardando">
+          @if (guardando) {
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+            Guardando...
+          } @else {
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>Registrar libro
+          }
+        </button>
+      </div>
+      @if (errorGuardar !== '') {
+        <div class="alert alert-danger mt-4 mb-0" role="alert">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ errorGuardar }}
+        </div>
+      }
+    </div>
+  </section>
+</form>
