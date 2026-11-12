@@ -1,4 +1,4 @@
 export interface EstadoServidorModel {
-  postgresql: boolean;
-  mongodb: boolean;
+  operacion: boolean;
+  fichas: boolean;
 }

@@ -2,26 +2,7 @@
   <div class="container">
     <div class="row gx-4 gy-5 align-items-center">
       <div class="col-lg-6 animate__animated animate__fadeIn">
-        <p class="marca-acceso"><i class="fa-solid fa-book" aria-hidden="true"></i>BiblioRed</p>
-        <h1>Circulación de libros entre sedes</h1>
-        <ul class="ventajas">
-          <li>
-            <span class="resumen-icono"
-              ><i class="fa-solid fa-database" aria-hidden="true"></i
-            ></span>
-            Reglas de préstamo en PostgreSQL
-          </li>
-          <li>
-            <span class="resumen-icono"><i class="fa-solid fa-leaf" aria-hidden="true"></i></span>
-            Fichas, reseñas y búsquedas en MongoDB
-          </li>
-          <li>
-            <span class="resumen-icono"
-              ><i class="fa-solid fa-user-shield" aria-hidden="true"></i
-            ></span>
-            Cada rol ve lo suyo
-          </li>
-        </ul>
+        <h1 class="marca-acceso"><i class="fa-solid fa-book" aria-hidden="true"></i>BiblioRed</h1>
       </div>
 
       <div class="col-12 col-md-9 col-lg-5 offset-lg-1">
@@ -100,19 +81,19 @@
           <ul class="meta servidor" aria-label="Estado del servidor">
             @if (estadoServidor) {
               <li>
-                <i class="fa-solid fa-database" aria-hidden="true"></i>PostgreSQL
+                <i class="fa-solid fa-right-left" aria-hidden="true"></i>Préstamos y catálogo
                 <span
                   class="estado"
-                  [attr.data-estado]="estadoServidor.postgresql ? 'ACTIVA' : 'SUSPENDIDO'"
-                  >{{ estadoServidor.postgresql ? 'En línea' : 'Sin conexión' }}</span
+                  [attr.data-estado]="estadoServidor.operacion ? 'ACTIVA' : 'SUSPENDIDO'"
+                  >{{ estadoServidor.operacion ? 'En línea' : 'Sin conexión' }}</span
                 >
               </li>
               <li>
-                <i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB
+                <i class="fa-solid fa-book-open" aria-hidden="true"></i>Fichas y reseñas
                 <span
                   class="estado"
-                  [attr.data-estado]="estadoServidor.mongodb ? 'ACTIVA' : 'SUSPENDIDO'"
-                  >{{ estadoServidor.mongodb ? 'En línea' : 'Sin conexión' }}</span
+                  [attr.data-estado]="estadoServidor.fichas ? 'ACTIVA' : 'SUSPENDIDO'"
+                  >{{ estadoServidor.fichas ? 'En línea' : 'Sin conexión' }}</span
                 >
               </li>
             } @else if (errorServidor !== '') {

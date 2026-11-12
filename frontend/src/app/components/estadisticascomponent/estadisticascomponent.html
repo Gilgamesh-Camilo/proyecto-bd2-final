@@ -43,9 +43,6 @@
             <h2 class="subtitulo-franja mb-0">
               <i class="fa-solid fa-building" aria-hidden="true"></i>Préstamos por sede
             </h2>
-            <span class="chip" title="GROUP BY con FILTER"
-              ><i class="fa-solid fa-database" aria-hidden="true"></i>PostgreSQL</span
-            >
           </div>
           @for (fila of estadisticas.prestamosPorSede; track fila.etiqueta) {
             <div class="fila">
@@ -69,9 +66,6 @@
             <h2 class="subtitulo-franja mb-0">
               <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i>Más prestados
             </h2>
-            <span class="chip" title="GROUP BY y ORDER BY"
-              ><i class="fa-solid fa-database" aria-hidden="true"></i>PostgreSQL</span
-            >
           </div>
           @for (fila of estadisticas.librosMasPrestados; track fila.etiqueta) {
             <div class="fila">
@@ -99,9 +93,6 @@
             <h2 class="subtitulo-franja mb-0">
               <i class="fa-solid fa-star" aria-hidden="true"></i>Mejor calificados
             </h2>
-            <span class="chip" title="$group, $match y $lookup"
-              ><i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB</span
-            >
           </div>
           @for (fila of estadisticas.mejorCalificados; track fila.etiqueta) {
             <div class="fila">
@@ -125,9 +116,6 @@
             <h2 class="subtitulo-franja mb-0">
               <i class="fa-solid fa-tags" aria-hidden="true"></i>Reseñas por categoría
             </h2>
-            <span class="chip" title="$lookup y $group"
-              ><i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB</span
-            >
           </div>
           @for (fila of estadisticas.resenasPorCategoria; track fila.etiqueta) {
             <div class="fila">
@@ -158,9 +146,6 @@
             <h2 class="subtitulo-franja mb-0">
               <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>Más buscados
             </h2>
-            <span class="chip" title="$group y $cond, últimos 60 días"
-              ><i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB</span
-            >
           </div>
           @for (fila of estadisticas.terminosMasBuscados; track fila.etiqueta) {
             <div class="fila">
@@ -184,9 +169,6 @@
             <h2 class="subtitulo-franja mb-0">
               <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>Sin resultado
             </h2>
-            <span class="chip" title="$match, $group y $addToSet"
-              ><i class="fa-solid fa-leaf" aria-hidden="true"></i>MongoDB</span
-            >
           </div>
           @for (fila of estadisticas.busquedasSinResultado; track fila.etiqueta) {
             <div class="fila">

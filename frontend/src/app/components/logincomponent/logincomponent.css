@@ -14,31 +14,17 @@
 .marca-acceso {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 1.5rem;
-  font-size: 1.35rem;
+  gap: 0.25em;
+  margin: 0;
+  font-size: clamp(3rem, 8vw, 5.5rem);
   font-weight: 650;
-  letter-spacing: -0.03em;
+  line-height: 1;
+  letter-spacing: -0.04em;
 }
 
 .marca-acceso i {
   color: var(--arena);
-}
-
-.ventajas {
-  display: grid;
-  gap: 1rem;
-  margin: 2.25rem 0 0;
-  padding: 0;
-  list-style: none;
-  color: var(--texto-suave);
-  font-size: 1.05rem;
-}
-
-.ventajas li {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  font-size: 0.8em;
 }
 
 .campo-clave {
